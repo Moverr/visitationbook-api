@@ -1,15 +1,14 @@
 package controllers.requests
 
+import controllers.requests.DateTimeReads.readDateTime
 import org.joda.time.DateTime
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
-import play.api.libs.json.{JsPath, Reads}
-import CustomTimeStamps._
-import play.api.libs.json.Format.GenericFormat
+import play.api.libs.json.{JsError, JsPath, JsResult, JsString, JsSuccess, JsValue, Reads}
 
 object VisitationRequestReads {
 
 
-  implicit val authorResponsewrites: Reads[VisitationRequest] = (
+  implicit val visitationRequestReads: Reads[VisitationRequest] = (
     (
       (JsPath \ "hostId").read[Long] and
         (JsPath \ "guestId").read[Long] and
@@ -21,3 +20,8 @@ object VisitationRequestReads {
     )
 
 }
+
+
+
+
+
