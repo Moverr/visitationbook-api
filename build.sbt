@@ -8,6 +8,7 @@ version := "1.0-SNAPSHOT"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.13.3"
+maintainer := "moverr@gmail.com"
 
 lazy val postgresversion = "9.4-1201-jdbc41"
 libraryDependencies ++= Seq(
@@ -43,15 +44,16 @@ libraryDependencies ++= Seq(
   "org.seleniumhq.selenium" % "selenium-java"            % "3.141.59",
   "commons-io"              % "commons-io"               % "2.8.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "org.scalatest"          %% "scalatest"                % "3.2.8" % "Test",
-  "org.scalamock"          %% "scalamock"                % "5.1.0" % "Test"
-, "org.typelevel" %%"cats-core"%"2.7.0"
+//  "org.scalatest"          %% "scalatest"                % "3.2.8" % "Test",
+//  "org.scalamock"          %% "scalamsock"                % "5.1.0" % "Test"
+ "org.typelevel" %%"cats-core"%"2.7.0"
 )
 
 scalacOptions ++=Seq(
   "-Xfatal-warnings"
 )
 
-
-
+enablePlugins(DockerPlugin)
+dockerExposedPorts ++= Seq(9000, 9001)
+dockerExposedUdpPorts += 4444
 //CQRS/Event Sourcing architecture
