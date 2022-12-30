@@ -27,9 +27,10 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "3.2.1",
   "com.typesafe.play" %% "play-slick" % "4.0.2",
   "org.scalactic" %% "scalactic" % "3.2.0",
-  "com.typesafe.slick" %% "slick-codegen" % "3.3.2",
-  "com.github.tminglei" %% "slick-pg" % "0.19.3",
-  "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
+  "com.typesafe.slick" %% "slick-codegen" % "3.4.1",
+  "com.github.tminglei" %% "slick-pg" % "0.21.1",
+  "com.typesafe.slick" %% "slick-hikaricp" % "3.4.1",
+  "ch.qos.logback" % "logback-classic" % "1.4.5",
 
   "org.scalatest" %% "scalatest-flatspec" % "3.2.0" % "test",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test",
