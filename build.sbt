@@ -59,4 +59,4 @@ dockerExposedUdpPorts += 4444
 //CQRS/Event Sourcing architecture
 swaggerDomainNameSpaces := Seq("models")
 
-libraryDependencies += "org.webjars" % "swagger-ui" % "4.15.0"
+libraryDependencies += "org.webjars" % "swagger-ui" % "4.11.1"
