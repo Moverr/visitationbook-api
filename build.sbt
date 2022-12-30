@@ -5,7 +5,7 @@ organization := "com.kodeinc"
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala,SwaggerPlugin)
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 //lazy val root = (project in file(".")).enablePlugins(PlayScala, SwaggerPlugin) //enable plugin
 scalaVersion := "2.13.3"
 maintainer := "moverr@gmail.com"
@@ -57,6 +57,6 @@ enablePlugins(DockerPlugin)
 dockerExposedPorts ++= Seq(9000, 9001)
 dockerExposedUdpPorts += 4444
 //CQRS/Event Sourcing architecture
-swaggerDomainNameSpaces := Seq("models")
+//swaggerDomainNameSpaces := Seq("models")
 
-libraryDependencies += "org.webjars" % "swagger-ui" % "4.11.1"
+//libraryDependencies += "org.webjars" % "swagger-ui" % "4.11.1"
