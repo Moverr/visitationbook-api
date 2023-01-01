@@ -61,3 +61,4 @@ dockerExposedUdpPorts += 4444
 //swaggerDomainNameSpaces := Seq("models")
 
 //libraryDependencies += "org.webjars" % "swagger-ui" % "4.11.1"
+
