@@ -1,22 +1,10 @@
 package models.entities
 
+import slick.jdbc.PostgresProfile.api._
+import slick.sql.SqlProfile.ColumnOption.SqlType
+
 import java.sql.Timestamp
-
-import slick.jdbc.PostgresProfile.api._
-import slick.sql.SqlProfile.ColumnOption.SqlType
-import slick.jdbc.PostgresProfile.api._
-import slick.lifted.TableQuery
-
-import java.util.UUID
-
-
-import slick.jdbc.PostgresProfile.api._
-import slick.sql.SqlProfile.ColumnOption.SqlType
 //import defaults ::
-import slick.lifted.TableQuery
-import slick.jdbc.JdbcProfile
-import slick.jdbc.PostgresProfile.api._
-import slick.lifted.TableQuery
 
 
 case class Visitation(id:Long,hostId:Option[Long], guestId:Option[Long], timeIn:Option[Timestamp], timeOut:Option[Timestamp], status:String, timezone:String,created_at:Timestamp,updated_at:Timestamp)
