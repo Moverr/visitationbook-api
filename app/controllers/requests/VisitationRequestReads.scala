@@ -7,7 +7,6 @@ import play.api.libs.json.{JsError, JsPath, JsResult, JsString, JsSuccess, JsVal
 
 object VisitationRequestReads {
 
-
   implicit val visitationRequestReads: Reads[VisitationRequest] = (
     (
       (JsPath \ "hostId").read[Long] and
