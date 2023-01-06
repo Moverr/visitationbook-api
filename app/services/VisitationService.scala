@@ -29,6 +29,7 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
   }
 
   override def archive(id:Integer): Unit ={
+
     ???
   }
   override def populate(entity:Visitation):VisitationResponse={
