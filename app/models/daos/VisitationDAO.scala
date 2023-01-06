@@ -22,7 +22,7 @@ class VisitationDAO  @Inject()
   import dbConfig._
 
   //todo: create
-  override def add(visitation:Visitation): Future[Visitation] = {
+  override def create(visitation:Visitation): Future[Visitation] = {
     val query = visitationTable.returning(visitationTable) += visitation
     db.run(query)
   }

@@ -10,7 +10,7 @@ trait TVisitationDAO {
   val visitationTable: TableQuery[VisitationTable]
 
   //todo: create
-  def add(visitation: Visitation): Future[Visitation]
+  def create(visitation: Visitation): Future[Visitation]
 
   //todo: list
   def list(offset: Long, limit: Long): Future[Seq[Visitation]]
