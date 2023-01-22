@@ -33,7 +33,7 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
     ???
   }
   override def populate(entity:Visitation):VisitationResponse={
-    val respnse:VisitationResponse = new VisitationResponse()
-    respnse
+    val response:VisitationResponse = new VisitationResponse()
+    response
   }
 }
