@@ -42,14 +42,14 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
        case Some(value) => Some(new DateTime(value))
        case None => None
      }
-     , entity.timeOut atch {
+     , entity.timeOut match {
        case Some(value) => Some(new DateTime(value))
        case None => None
      }
      , entity.status
      , entity.timezone
-     , entity.created_at
-     , entity.updated_at
+     , new DateTime(entity.created_at)
+     , new DateTime(entity.updated_at)
    )
 
 }
