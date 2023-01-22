@@ -4,6 +4,7 @@ import controllers.requests.VisitationRequest
 import controllers.responses.VisitationResponse
 import models.daos.TVisitationDAO
 import models.entities.Visitation
+import org.joda.time.DateTime
 
 import java.sql.Timestamp
 import javax.inject.Inject
@@ -32,8 +33,23 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
 
     ???
   }
-  override def populate(entity:Visitation):VisitationResponse={
-    val response:VisitationResponse = new VisitationResponse()
-    response
-  }
+  override def populate(entity:Visitation):VisitationResponse=
+   new VisitationResponse (
+     entity.id
+     , entity.hostId
+     , entity.guestId
+     , entity.timeIn match {
+       case Some(value) => Some(new DateTime(value))
+       case None => None
+     }
+     , entity.timeOut atch {
+       case Some(value) => Some(new DateTime(value))
+       case None => None
+     }
+     , entity.status
+     , entity.timezone
+     , entity.created_at
+     , entity.updated_at
+   )
+
 }
