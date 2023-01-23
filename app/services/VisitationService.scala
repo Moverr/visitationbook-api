@@ -5,6 +5,8 @@ import controllers.responses.VisitationResponse
 import models.daos.TVisitationDAO
 import models.entities.Visitation
 import org.joda.time.DateTime
+import utils.Commons
+import utils.Commons.getDate
 
 import java.sql.Timestamp
 import javax.inject.Inject
@@ -38,18 +40,13 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
      entity.id
      , entity.hostId
      , entity.guestId
-     , entity.timeIn match {
-       case Some(value) => Some(new DateTime(value))
-       case None => None
-     }
-     , entity.timeOut match {
-       case Some(value) => Some(new DateTime(value))
-       case None => None
-     }
+     , Commons getDate entity.timeIn
+     , Commons getDate entity.timeOut
      , entity.status
      , entity.timezone
      , new DateTime(entity.created_at)
      , new DateTime(entity.updated_at)
    )
+
 
 }
