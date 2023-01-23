@@ -21,7 +21,7 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
   //todo: lists
   override def list(offset:Long,limit:Long): Future[Seq[VisitationResponse]] ={
     val response:Future[Seq[Visitation]] = visitationDao.list(offset,limit)
-    response.map(r=>r.map(x=>populate(x)))
+    response.map(futureResponse=>futureResponse.map(record=>populate(record)))
   }
   //todo: get by id
   override def getById(id:Long):Future[Option[VisitationResponse]]={
@@ -34,7 +34,7 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
     ???
   }
   override def populate(entity:Visitation):VisitationResponse=
-   new VisitationResponse (
+    VisitationResponse (
      entity.id
      , entity.hostId
      , entity.guestId
