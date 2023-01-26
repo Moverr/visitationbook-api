@@ -2,31 +2,51 @@ package controllers
 
 import controllers.requests.VisitationRequest
 import controllers.requests.VisitationRequestReads.visitationRequestReads
-import play.api.mvc.{BaseController, ControllerComponents, Result}
+import controllers.responses.VisitationResponse
+import controllers.responses.VisitationResponseWrites._
+import play.api.libs.json.Json
+import play.api.mvc.{BaseController, ControllerComponents}
+import services.{TVisitationService, VisitationService}
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-@Singleton
-class VisitationController @Inject()(val controllerComponents: ControllerComponents) extends BaseController{
 
-  def create() = Action.async  { implicit  request =>
+@Singleton
+class VisitationController @Inject()(
+                                      val controllerComponents: ControllerComponents,
+                                      val service: TVisitationService
+                                    ) extends BaseController {
+
+  def create() = Action.async { implicit request =>
 
     val json = request.body.asJson.get
-    // clelan way of getting info from thhe clients
-    val record:VisitationRequest = json.as[VisitationRequest]
-
-
-
-    ???
-
+    val record: VisitationRequest = json.as[VisitationRequest]
+    service.create(record)
+      .flatMap(response => Future.successful(Ok(Json.toJson(response)))
   }
 
-  def list(): Unit ={
-
+  def list(limit:Long  = 20, offset:Long= 1)  =Action.async { implicit request =>
+    val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
+    response.flatMap(value=>Future.successful(Ok(Json.toJson(value))))
   }
 
-  def archive(): Unit ={
+
+  def getById(id: Long ) = Action.async { implicit request =>
+    val response: Future[Option[VisitationResponse]] = service.getById(id)
+    response.flatMap(
+      value =>
+        value match {
+          case Some(value) => Future.successful(Ok(Json.toJson(value)))
+          case None => Future.successful(Ok(Json.toJson(value)))
+        }
+
+    )
+  }
+
+
+  def archive(): Unit = {
 
   }
 

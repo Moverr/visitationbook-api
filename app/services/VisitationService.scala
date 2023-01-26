@@ -1,13 +1,11 @@
 package services
 
 import controllers.requests.VisitationRequest
-import controllers.responses.VisitationResponse
+import controllers.responses._
 import models.daos.TVisitationDAO
 import models.entities.Visitation
 import org.joda.time.DateTime
-import utils.Commons
-import utils.Commons.getDate
-
+import utils._
 import java.sql.Timestamp
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

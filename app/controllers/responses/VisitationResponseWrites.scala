@@ -7,9 +7,9 @@ import play.api.libs.json.{JsPath, Writes}
 
 import DateTimeWrites._
 
-object VisistationWrites {
+object VisitationResponseWrites {
 
-  val VisistationWrites: Writes[VisitationResponse] = (
+  implicit val VisitationResponseWrites: Writes[VisitationResponse] = (
     (
       (JsPath \ "id").write[Long] and
         (JsPath \ "hostId").write[Option[Long]] and
