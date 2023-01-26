@@ -2,7 +2,8 @@ package controllers
 
 import controllers.requests.VisitationRequest
 import controllers.requests.VisitationRequestReads.visitationRequestReads
-import controllers.responses.VisitationResponse
+import controllers.responses.ErrorRespnseWrites.ErrorRespnseWrites
+import controllers.responses.{ErrorRespnse, VisitationResponse}
 import controllers.responses.VisitationResponseWrites._
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
@@ -39,7 +40,7 @@ class VisitationController @Inject()(
       value =>
         value match {
           case Some(value) => Future.successful(Ok(Json.toJson(value)))
-          case None => Future.successful(Ok(Json.toJson(value)))
+          case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse("ses","Item Not Fund"))))
         }
 
     )
