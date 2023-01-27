@@ -19,5 +19,10 @@ trait TVisitationDAO {
   def get(id: Long): Future[Option[Visitation]]
 
   //todo: update
-  def update(id: Long, visitation: Visitation): Future[Either[Throwable, String]]
+
+  def update(id: Long, visitation: Visitation): Future[Visitation]
+
+  //todo: delete recrod
+  def delete(id:Long)
+
 }

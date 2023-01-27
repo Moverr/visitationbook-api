@@ -25,7 +25,7 @@ class VisitationController @Inject()(
     val json = request.body.asJson.get
     val record: VisitationRequest = json.as[VisitationRequest]
     service.create(record)
-      .flatMap(response => Future.successful(Ok(Json.toJson(response)))
+      .flatMap(response => Future.successful(Ok(Json.toJson(response))))
   }
 
   def list(limit:Long  = 20, offset:Long= 1)  =Action.async { implicit request =>

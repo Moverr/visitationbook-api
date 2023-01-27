@@ -8,7 +8,7 @@ object Commons {
 
   def getDate(entity: Option[Timestamp]): Option[DateTime] =
     entity match {
-      case Some(value) => Some(new DateTime(value))
+      case Some(value) => Some(new DateTime(value.getTime))
       case None => None
     }
 

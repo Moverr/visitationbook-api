@@ -4,8 +4,9 @@ import controllers.requests.VisitationRequest
 import controllers.responses._
 import models.daos.TVisitationDAO
 import models.entities.Visitation
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 import utils._
+
 import java.sql.Timestamp
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -14,7 +15,7 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
 
   //todo: create
   override def create(request:VisitationRequest): Future[VisitationResponse] ={
-    val visit:Visitation = new Visitation(0l, Some(request.hostId),Some(request.guestId),Some( new Timestamp( request.timeIn.getMillis)),Some( new Timestamp( request.timeOut.getMillis)),request.status,request.timezone,  Timestamp, Timestamp)
+    val visit:Visitation = new Visitation(0L, Some(request.hostId),Some(request.guestId),Some( new Timestamp( request.timeIn.getMillis)),Some( new Timestamp( request.timeOut.getMillis)),request.status,request.timezone,   new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
     val response:Future[Visitation] = visitationDao.create(visit)
     response.map(record=>populate(record))
   }
@@ -38,12 +39,12 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
      entity.id
      , entity.hostId
      , entity.guestId
-     , Commons getDate entity.timeIn
-     , Commons getDate entity.timeOut
+     ,  entity.timeIn
+     ,   entity.timeOut
      , entity.status
      , entity.timezone
-     , new DateTime(entity.created_at)
-     , new DateTime(entity.updated_at)
+     ,  entity.created_at
+     , entity.updated_at
    )
 
 
