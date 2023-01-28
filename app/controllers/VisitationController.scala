@@ -17,7 +17,7 @@ import scala.concurrent.Future
 @Singleton
 class VisitationController @Inject()(
                                       val controllerComponents: ControllerComponents,
-                                      val service: TVisitationService
+                                      val service: VisitationService
                                     ) extends BaseController {
 
   def create() = Action.async { implicit request =>
@@ -28,7 +28,7 @@ class VisitationController @Inject()(
       .flatMap(response => Future.successful(Ok(Json.toJson(response))))
   }
 
-  def list(limit:Long  = 20, offset:Long= 1)  =Action.async { implicit request =>
+  def list(limit:Long  = 20, offset:Long= 0)  =Action.async { implicit request =>
     val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
     response.flatMap(value=>Future.successful(Ok(Json.toJson(value))))
   }

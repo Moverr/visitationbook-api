@@ -31,7 +31,7 @@ class VisitationDAO  @Inject()
 
   //todo: list
   override def list(offset: Long, limit: Long): Future[Seq[Visitation]] = {
-    db.run(visitationTable.sortBy(_.created_at).take(limit).drop(offset).result)
+    db.run(visitationTable.sortBy(_.created_at).take(offset).drop(limit).result)
   }
 
   //todo: get by id
