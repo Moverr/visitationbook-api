@@ -37,13 +37,12 @@ class VisitationDAO  @Inject()
   //todo: update
   override def update(id:Long,visitation: Visitation): Future[Visitation] = {
 
-    val query =visitationTable.filter(_.id === id)
-      .update(visitationTable) = visitation
+    val query =visitationTable.filter(_.id === id).update(visitation)
     db.run(query)
     Future.successful(visitation)
   }
 
-  override def delete(id:Long): Unit ={
+  override def delete(id:Long): Any ={
     val queury = visitationTable.filter(_.id === id).delete
     db.run(queury)
   }

@@ -23,6 +23,6 @@ trait TVisitationDAO {
   def update(id: Long, visitation: Visitation): Future[Visitation]
 
   //todo: delete recrod
-  def delete(id:Long)
+  def delete(id:Long):Any
 
 }
