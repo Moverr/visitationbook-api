@@ -2,9 +2,10 @@ package controllers
 
 import controllers.requests.VisitationRequest
 import controllers.requests.VisitationRequestReads.visitationRequestReads
-import controllers.responses.ErrorRespnseWrites.ErrorRespnseWrites
+import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import controllers.responses.VisitationResponseWrites._
+import play.api.http.Status.BAD_REQUEST
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
 import services.{TVisitationService, VisitationService}
@@ -28,7 +29,7 @@ class VisitationController @Inject()(
       .flatMap(response => Future.successful(Ok(Json.toJson(response))))
   }
 
-  def list(limit:Long  = 20, offset:Long= 0)  =Action.async { implicit request =>
+  def list(limit:Long , offset:Long)  =Action.async { implicit request =>
     val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
     response.flatMap(value=>Future.successful(Ok(Json.toJson(value))))
   }
@@ -40,7 +41,7 @@ class VisitationController @Inject()(
       value =>
         value match {
           case Some(value) => Future.successful(Ok(Json.toJson(value)))
-          case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse("ses","Item Not Fund"))))
+          case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST,"Item does not exist"))))
         }
 
     )

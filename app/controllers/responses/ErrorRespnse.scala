@@ -10,14 +10,14 @@ import play.api.libs.json.{JsPath, Writes}
 
 
 sealed trait Error
-case class ErrorRespnse(code:String,message:String) extends Error
+case class ErrorRespnse(code:Int,message:String) extends Error
 object ErrorRespnseWrites{
-  implicit val ErrorRespnseWrites: Writes[ErrorRespnse] = (
+  implicit val ErrorResponseWrites: Writes[ErrorRespnse] =
     (
 
-        (JsPath \ "code").write[String] and
-        (JsPath \ "v").write[String]
+        (JsPath \ "code").write[Int] and
+        (JsPath \ "message").write[String]
 
       ) (unlift(ErrorRespnse.unapply))
-    )
+
 }
