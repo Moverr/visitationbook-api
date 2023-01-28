@@ -3,12 +3,14 @@ package models.daos
 
 import models.entities.{Visitation, VisitationTable}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
+
+import scala.concurrent.impl.Promise
 
 
 
@@ -22,28 +24,38 @@ class VisitationDAO  @Inject()
   import dbConfig._
 
   //todo: create
-  override def create(visitation:Visitation): Future[Visitation] = {
+  override def create(visitation: Visitation): Future[Visitation] = {
     val query = visitationTable.returning(visitationTable) += visitation
     db.run(query)
   }
+
   //todo: list
-  override def list(offset:Long,limit:Long):Future[Seq[Visitation]] ={
+  override def list(offset: Long, limit: Long): Future[Seq[Visitation]] = {
     db.run(visitationTable.sortBy(_.created_at).take(limit).drop(offset).result)
   }
+
   //todo: get by id
-  override def get(id:Long):Future[Option[Visitation]]={
+  override def get(id: Long): Future[Option[Visitation]] = {
     db.run(visitationTable.filter(_.id === id).result.headOption)
   }
-  //todo: update
-  override def update(id:Long,visitation: Visitation): Future[Visitation] = {
 
-    val query =visitationTable.filter(_.id === id).update(visitation)
+  //todo: update
+  override def update(id: Long, visitation: Visitation): Future[Visitation] = {
+
+    val query = visitationTable.filter(_.id === id).update(visitation)
     db.run(query)
     Future.successful(visitation)
   }
 
-  override def delete(id:Long): Any ={
-    val queury = visitationTable.filter(_.id === id).delete
-    db.run(queury)
+  override def delete(id: Long): Any = {
+    val query = visitationTable.filter(_.id === id).delete
+    db.run(query)
+  }
+
+
+  def archive(id: Long): Any = {
+    //val query = visitationTable.filter(_.id === id).map(_.status=="archived").update()
+     ???
+
   }
 }

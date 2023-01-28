@@ -17,7 +17,7 @@ trait TVisitationService {
   //todo: get by id
   def getById(id: Long): Future[Option[VisitationResponse]]
 
-  def archive(id: Integer): Unit
+  def archive(id: Long): Unit
 
   def populate(entity: Visitation): VisitationResponse
 }

@@ -30,9 +30,13 @@ class VisitationService @Inject()(visitationDao:TVisitationDAO)(implicit executi
     response.map(value=>value.map(optionValue=>populate(optionValue)))
   }
 
-  override def archive(id:Integer): Unit ={
+  override def archive(id:Long): Unit ={
 
     ???
+  }
+
+  def delete(id:Long): Unit ={
+    visitationDao.delete(id)
   }
   override def populate(entity:Visitation):VisitationResponse=
     VisitationResponse (
