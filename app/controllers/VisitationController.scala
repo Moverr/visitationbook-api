@@ -5,10 +5,9 @@ import controllers.requests.VisitationRequestReads.visitationRequestReads
 import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import controllers.responses.VisitationResponseWrites._
-import play.api.http.Status.BAD_REQUEST
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
-import services.{TVisitationService, VisitationService}
+import services.{ VisitationService}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
