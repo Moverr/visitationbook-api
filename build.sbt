@@ -52,6 +52,10 @@ libraryDependencies ++= Seq(
   "org.aspectj" % "aspectjweaver" % "1.9.19",
   "org.aspectj" % "aspectjrt" % "1.9.19",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+  "ch.qos.logback" % "logback-classic" % "1.4.5",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+  "ch.qos.logback" % "logback-classic" % "1.4.5",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
   "ch.qos.logback" % "logback-classic" % "1.4.5"
 )
 
