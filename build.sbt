@@ -18,36 +18,41 @@ libraryDependencies ++= Seq(
   javaJpa,
   ws,
   caffeine,
-  "org.hibernate" % "hibernate-core" % "5.4.9.Final",
-  "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
-  "org.scalactic" %% "scalactic" % "3.2.2",
-  "com.typesafe.slick" %% "slick" % "3.3.2",
-  "com.typesafe.slick" %% "slick-testkit" % "3.3.3" % "test",
-  "com.typesafe.play" %% "play-json" % "2.8.0-M5",
-  "com.typesafe.slick" %% "slick" % "3.2.1",
-  "com.typesafe.play" %% "play-slick" % "4.0.2",
-  "org.scalactic" %% "scalactic" % "3.2.0",
+  "org.hibernate" % "hibernate-core" % "5.5.6",
+  "org.postgresql" % "postgresql" % "42.5.4",
+  "org.scalactic" %% "scalactic" % "3.2.15",
+  "com.typesafe.slick" %% "slick" % "3.4.1",
+  "com.typesafe.slick" %% "slick-testkit" % "3.4.1" % "test",
+  "com.typesafe.play" %% "play-json" % "2.9.4",
+  "com.typesafe.slick" %% "slick" % "3.4.1",
+  "com.typesafe.play" %% "play-slick" % "5.1.0",
+  "org.scalactic" %% "scalactic" % "3.2.15",
   "com.typesafe.slick" %% "slick-codegen" % "3.4.1",
   "com.github.tminglei" %% "slick-pg" % "0.21.1",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.4.1",
 //  "ch.qos.logback" % "logback-classic" % "1.4.5",
 
-  "org.scalatest" %% "scalatest-flatspec" % "3.2.0" % "test",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test",
-  "org.scalatestplus" %% "mockito-3-4" % "3.2.2.0" % "test",
+  "org.scalatest" %% "scalatest-flatspec" % "3.2.15" % "test",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
+  "org.scalatestplus" %% "mockito-3-4" % "3.2.10.0" % "test",
 
   //Adding JWT TOkens
-  "com.nimbusds" % "nimbus-jose-jwt" % "8.20.2",
+  "com.nimbusds" % "nimbus-jose-jwt" % "9.30.2",
 
   // Adding akka actors
-  "com.typesafe.akka" %% "akka-actor" % "2.6.3",
+  "com.typesafe.akka" %% "akka-actor" % "2.7.0",
 
-  "org.seleniumhq.selenium" % "selenium-java"            % "3.141.59",
-  "commons-io"              % "commons-io"               % "2.8.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "org.seleniumhq.selenium" % "selenium-java"            % "4.8.1",
+  "commons-io"              % "commons-io"               % "20030203.000550",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
 //  "org.scalatest"          %% "scalatest"                % "3.2.8" % "Test",
 //  "org.scalamock"          %% "scalamsock"                % "5.1.0" % "Test"
- "org.typelevel" %%"cats-core"%"2.7.0"
+ "org.typelevel" %%"cats-core"%"2.9.0",
+  "org.scalatest" %% "scalatest" % "3.2.15" % "test",
+  "org.aspectj" % "aspectjweaver" % "1.9.19",
+  "org.aspectj" % "aspectjrt" % "1.9.19",
+  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
+  "ch.qos.logback" % "logback-classic" % "1.4.5"
 )
 
 scalacOptions ++=Seq(

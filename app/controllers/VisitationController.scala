@@ -7,9 +7,10 @@ import controllers.responses.{ErrorRespnse, VisitationResponse}
 import controllers.responses.VisitationResponseWrites._
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
-import services.{ VisitationService}
+import services.VisitationService
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -22,10 +23,16 @@ class VisitationController @Inject()(
 
   def create() = Action.async { implicit request =>
 
-    val json = request.body.asJson.get
-    val record: VisitationRequest = json.as[VisitationRequest]
-    service.create(record)
-      .flatMap(response => Future.successful(Ok(Json.toJson(response))))
+    try {
+
+      val json = request.body.asJson.get
+      val record: VisitationRequest = json.as[VisitationRequest]
+      service.create(record)
+        .flatMap(response => Future.successful(Ok(Json.toJson(response))))
+    }
+    catch{
+      case e:Exception => Future.successful(BadRequest(e.getLocalizedMessage))
+    }
   }
 
   def list(limit:Long , offset:Long)  =Action.async { implicit request =>
