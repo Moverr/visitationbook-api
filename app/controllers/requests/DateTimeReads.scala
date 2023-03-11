@@ -12,7 +12,6 @@ object DateTimeReads{
     private val format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US)
 
     override def reads(json: JsValue): JsResult[DateTime] = json match {
-
       case JsString(d) => Try(format.parse(d)).map(t => JsSuccess(new DateTime(t))).getOrElse(error(json))
       case _ => error(json)
     }
