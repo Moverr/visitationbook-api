@@ -15,8 +15,8 @@ object VisitationResponseWrites {
       (JsPath \ "id").write[Long] and
         (JsPath \ "hostId").write[Option[Long]] and
         (JsPath \ "guestId").write[Option[Long]] and
-        (JsPath \ "timeIn").write[Option[Timestamp]] and
-        (JsPath \ "timeOut").write[Option[Timestamp]] and
+        (JsPath \ "timeIn").write[Option[String]] and
+        (JsPath \ "timeOut").write[Option[String]] and
         (JsPath \ "status").write[String] and
         (JsPath \ "timezone").write[String] and
         (JsPath \ "created_at").write[Timestamp] and
