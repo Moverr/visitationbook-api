@@ -9,7 +9,7 @@ import scala.concurrent.Future
 trait TVisitationService {
 
   //todo: create
-  def create(request: VisitationRequest): Future[VisitationResponse]
+  def create(request: VisitationRequest):Either[Throwable, Future[VisitationResponse]]
 
   //todo: lists
   def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]]

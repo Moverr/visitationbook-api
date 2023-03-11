@@ -14,10 +14,17 @@ import scala.concurrent.{ExecutionContext, Future}
 class VisitationService @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) extends TVisitationService {
 
   //todo: create
-  override def create(request: VisitationRequest): Future[VisitationResponse] = {
-    val visit: Visitation = new Visitation(0L, Some(request.hostId), Some(request.guestId), Some(new Timestamp(DateTime.parse(request.timeIn).getMillis)), Some(new Timestamp(DateTime.parse(request.timeOut).getMillis)), request.status, request.timezone, new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
+  override def create(request: VisitationRequest):  Either[Throwable,Future[VisitationResponse]] = {
+    //validate request
+    val timeOutDate:DateTime =   DateTime.parse(request.timeOut);
+    val timeInDate:DateTime =  DateTime.parse(request.timeIn)
+    if(timeInDate.isAfter(timeOutDate)){
+      return Left(new RuntimeException("Time In should be less than Time Out "))
+    }
+
+    val visit: Visitation = new Visitation(0L, Some(request.hostId), Some(request.guestId), Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status, request.timezone, new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
     val response: Future[Visitation] = visitationDao.create(visit)
-    response.map(record => populate(record))
+    Right(response.map(record => populate(record)))
   }
 
   //todo: lists

@@ -3,14 +3,13 @@ package controllers
 import controllers.requests.VisitationRequest
 import controllers.requests.VisitationRequestReads.visitationRequestReads
 import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
-import controllers.responses.{ErrorRespnse, VisitationResponse}
 import controllers.responses.VisitationResponseWrites._
+import controllers.responses.{ErrorRespnse, VisitationResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
 import services.VisitationService
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -28,26 +27,36 @@ class VisitationController @Inject()(
       val json = request.body.asJson.get
       val record: VisitationRequest = json.as[VisitationRequest]
       service.create(record)
-        .flatMap(response => Future.successful(Ok(Json.toJson(response))))
+      match {
+        case Left(exception) => {
+          exception match {
+            case e:RuntimeException =>  Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST,exception.getMessage))))
+            case _ =>  Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR,"Internal Sever Error"))))
+          }
+
+        }
+        case Right(result) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
+      }
+
     }
-    catch{
-      case e:Exception => Future.successful(BadRequest(e.getLocalizedMessage))
+    catch {
+      case e: Exception => Future.successful(BadRequest(e.getLocalizedMessage))
     }
   }
 
-  def list(limit:Long , offset:Long)  =Action.async { implicit request =>
+  def list(limit: Long, offset: Long) = Action.async { implicit request =>
     val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
-    response.flatMap(value=>Future.successful(Ok(Json.toJson(value))))
+    response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
   }
 
 
-  def getById(id: Long ) = Action.async { implicit request =>
+  def getById(id: Long) = Action.async { implicit request =>
     val response: Future[Option[VisitationResponse]] = service.getById(id)
     response.flatMap(
       value =>
         value match {
           case Some(value) => Future.successful(Ok(Json.toJson(value)))
-          case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST,"Item does not exist"))))
+          case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Item does not exist"))))
         }
 
     )
