@@ -15,7 +15,7 @@ class VisitationService @Inject()(visitationDao:VisitationDAO)(implicit executio
 
   //todo: create
   override def create(request:VisitationRequest): Future[VisitationResponse] ={
-    val visit:Visitation = new Visitation(0L, Some(request.hostId),Some(request.guestId),Some( new Timestamp( request.timeIn.getMillis)),Some( new Timestamp( request.timeOut.getMillis)),request.status,request.timezone,   new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
+    val visit:Visitation = new Visitation(0L, Some(request.hostId),Some(request.guestId),Some(new Timestamp( DateTime.parse(request.timeIn).getMillis)),Some( new Timestamp(DateTime.parse(request.timeOut).getMillis)),request.status,request.timezone,   new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
     val response:Future[Visitation] = visitationDao.create(visit)
     response.map(record=>populate(record))
   }

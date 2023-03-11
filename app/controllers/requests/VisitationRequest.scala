@@ -1,6 +1,6 @@
 package controllers.requests
 
-import org.joda.time.DateTime
+import akka.http.javadsl.model.DateTime
 
-case class VisitationRequest(hostId:Long, guestId:Long, timeIn:DateTime, timeOut:DateTime, status:String, timezone:String)
+case class VisitationRequest(hostId:Long, guestId:Long, timeIn:String, timeOut:String, status:String, timezone:String)
 
