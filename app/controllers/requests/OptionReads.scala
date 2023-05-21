@@ -6,11 +6,11 @@ object OptionReads {
     override def reads(json: JsValue): JsResult[Option[Long]] = json match {
       case JsNull => JsSuccess(Option.empty)
       case JsNumber(value) =>  JsSuccess(Some(value.longValue))
-
+      case _ => JsSuccess(Option.empty)
     }
   }
 
-
+/*
   implicit val floatOptin: Reads[Option[Float]] = new Reads[Option[Float]] {
     override def reads(json: JsValue): JsResult[Option[Float]] = json match {
       case JsNull => JsSuccess(Option.empty)
@@ -45,5 +45,6 @@ object OptionReads {
 
     }
   }
+  */
 
 }
