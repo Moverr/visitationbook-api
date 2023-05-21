@@ -8,6 +8,6 @@ case class VisitationRequest(
                               officeId:Option[Long],
                               departmentId:Option[Long],
                              timeIn:String, timeOut:String,
-                             status:VisitationStatus
+                             status:String
                              , timezone:String)
 
