@@ -11,7 +11,7 @@ import  VisitationStatusReads.readVisitationStatus
 object VisitationRequestReads {
 
   implicit val visitationRequestReads: Reads[VisitationRequest] = (
-    (JsPath \ "host_id").read[Long] and
+    (JsPath \ "host_id").readNullable[Long] and
       (JsPath \ "guest_id").readNullable[Long] and
       (JsPath \ "office_id").readNullable[Long] and
       (JsPath \ "department_id").readNullable[Long] and

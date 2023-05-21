@@ -22,7 +22,7 @@ class VisitationService @Inject()(visitationDao: VisitationDAO)(implicit executi
       return Left(new RuntimeException("Time In should be less than Time Out "))
     }
 
-    val visit: Visitation = new Visitation(0L, Some(request.hostId), Some(request.guestId), Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status, request.timezone, new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
+    val visit: Visitation =   Visitation(0L,request.hostId, request.guestId, request.officeId, request.departmentId, Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status, request.timezone, new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
     val response: Future[Visitation] = visitationDao.create(visit)
     Right(response.map(record => populate(record)))
   }
