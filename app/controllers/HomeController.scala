@@ -20,7 +20,7 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    */
   case class AppInfo(name:String,version:String,author:String)
   def index() = Action { implicit request: Request[AnyContent] =>
-    val message:AppInfo = AppInfo("Booking System","2022.11.06","moverr@gmail,com")
+    val message:AppInfo = AppInfo("kitabo Booking System","2022.11.06","moverr@gmail,com")
 
     Ok(views.html.index(message.name)(message.author)(message.version))
   }
