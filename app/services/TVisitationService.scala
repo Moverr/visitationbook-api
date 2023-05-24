@@ -1,6 +1,6 @@
 package services
 
-import controllers.requests.VisitationRequest
+import controllers.requests.VisitationsRequest
 import controllers.responses.VisitationResponse
 import models.entities.Visitation
 
@@ -9,7 +9,7 @@ import scala.concurrent.Future
 trait TVisitationService {
 
   //todo: create
-  def create(request: VisitationRequest):Either[Throwable, Future[VisitationResponse]]
+  def create(request: VisitationsRequest):Either[Throwable, Future[VisitationResponse]]
 
   //todo: lists
   def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]]

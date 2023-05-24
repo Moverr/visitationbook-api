@@ -10,7 +10,7 @@ import  VisitationStatusReads.readVisitationStatus
 
 object VisitationRequestReads {
 
-  implicit val visitationRequestReads: Reads[VisitationRequest] = (
+  implicit val visitationRequestReads: Reads[VisitationsRequest] = (
     (JsPath \ "host_id").readNullable[Long] and
       (JsPath \ "guest_id").readNullable[Long] and
       (JsPath \ "office_id").readNullable[Long] and
@@ -19,7 +19,7 @@ object VisitationRequestReads {
       (JsPath \ "time_out").read[String] and
       (JsPath \ "status").read[String] and
       (JsPath \ "timezone").read[String]
-    ) (VisitationRequest.apply _)
+    ) (VisitationsRequest.apply _)
 
 }
 

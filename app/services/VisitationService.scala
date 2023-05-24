@@ -1,6 +1,6 @@
 package services
 
-import controllers.requests.VisitationRequest
+import controllers.requests.VisitationsRequest
 import controllers.responses._
 import models.daos.{TVisitationDAO, VisitationDAO}
 import models.entities.Visitation
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VisitationService @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) extends TVisitationService {
 
   //todo: create
-  override def create(request: VisitationRequest):  Either[Throwable,Future[VisitationResponse]] = {
+  override def create(request: VisitationsRequest):  Either[Throwable,Future[VisitationResponse]] = {
     //validate request
     val timeOutDate:DateTime =   DateTime.parse(request.timeOut);
     val timeInDate:DateTime =  DateTime.parse(request.timeIn)
