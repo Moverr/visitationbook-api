@@ -19,9 +19,9 @@ case class visitationRequest(id:Long
                              ,departmentId:Option[Long],
                              invtype:Option[String],
                              date_created:Timestamp,
-                             created_by:Option[Int],
+                             created_by:Option[Long],
                              updated_at:Timestamp
-                             ,updated_by:Option[Int]
+                             ,updated_by:Option[Long]
                             )
 
 class VisitationRequestTable(tag:Tag) extends  Table[visitationRequest] (tag,"visitationrequests"){
