@@ -5,13 +5,14 @@ import controllers.responses._
 import models.daos.{TVisitationDAO, VisitationDAO}
 import models.entities.Visitation
 import org.joda.time.{DateTime, DateTimeZone}
+import services.interfaces.TVisitationService
 import utils._
 
 import java.sql.Timestamp
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class VisitationService @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) extends TVisitationService {
+class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) extends TVisitationService {
 
   //todo: create
   override def create(request: VisitationsRequest):  Either[Throwable,Future[VisitationResponse]] = {

@@ -5,7 +5,7 @@ import play.api.Logger
 
 
 
-public class CustomLog {
+  class CustomLog {
 
   def apply(): slf4j.Logger = {
     val loggerInfra: Logger = Logger("CustomLogger")
@@ -13,7 +13,7 @@ public class CustomLog {
   }
 }
 
-public object CustomLog extends CustomLog{
+  object CustomLog extends CustomLog{
   def log():  slf4j.Logger ={
     val CustomLog = new CustomLog().apply();
     CustomLog

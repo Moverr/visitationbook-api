@@ -7,7 +7,7 @@ import controllers.responses.VisitationResponseWrites._
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
-import services.VisitationService
+import services.VisitationServiceImpl
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -17,7 +17,7 @@ import scala.concurrent.Future
 @Singleton
 class VisitationController @Inject()(
                                       val controllerComponents: ControllerComponents,
-                                      val service: VisitationService
+                                      val service: VisitationServiceImpl
                                     ) extends BaseController {
 
   def create() = Action.async { implicit request =>
@@ -28,13 +28,12 @@ class VisitationController @Inject()(
       val record: VisitationsRequest = json.as[VisitationsRequest]
       service.create(record)
       match {
-        case Left(exception) => {
+        case Left(exception) =>
           exception match {
             case e:RuntimeException =>  Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST,exception.getMessage))))
             case _ =>  Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR,"Internal Sever Error"))))
           }
 
-        }
         case Right(result) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
       }
 

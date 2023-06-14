@@ -20,7 +20,6 @@ class RequestTracerAOP {
     val methodName: String = jointPoint.getSignature.toString
     val inputArgs:String = jointPoint.getArgs.toString
 
-    //todo: add timestamp
       logger.info(s"request received in the method "+methodName+" with arguments {} "+inputArgs)
     val output:Object = jointPoint.proceed()
 
