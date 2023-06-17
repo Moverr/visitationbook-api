@@ -18,7 +18,7 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
     "render the index page from a new instance of controller" in {
       val controller = new HomeController(stubControllerComponents())
       val home = controller.index().apply(FakeRequest(GET, "/"))
-      val message:AppInfo = AppInfo("kitabo Booking System","2022.11.06","moverr@gmail,com")
+   //   val message:AppInfo = AppInfo("kitabo Booking System","2022.11.06","moverr@gmail,com")
 
       status(home) mustBe OK
     }
