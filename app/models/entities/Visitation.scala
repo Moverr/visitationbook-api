@@ -14,12 +14,12 @@ case class Visitation(id:Long,hostId:Option[Long], guestId:Option[Long],officeId
   class VisitationTable(tag: Tag) extends Table[Visitation](tag,"visitations") {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
-    def hostId = column[Option[Long]]("hostid")
+    def hostId = column[Option[Long]]("host_id")
 
-    def guestId = column[Option[Long]]("guestId")
-    def officeId = column[Option[Long]]("officeid")
+    def guestId = column[Option[Long]]("guest_id")
+    def officeId = column[Option[Long]]("office_id")
 
-    def departmentId = column[Option[Long]]("departmentid")
+    def departmentId = column[Option[Long]]("department_id")
 
 
     def timeIn = column[Option[Timestamp]]("time_in")

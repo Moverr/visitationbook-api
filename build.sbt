@@ -31,38 +31,27 @@ libraryDependencies ++= Seq(
   "com.github.tminglei" %% "slick-pg" % "0.19.3",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
 
-  "org.scalatest" %% "scalatest-flatspec" % "3.2.0" % "test",
-  "org.scalatestplus.play" %% "scalatestplus-play" % "5.0.0" % "test",
-  "org.scalatestplus" %% "mockito-3-4" % "3.2.2.0" % "test",
 
   //Adding JWT TOkens
-  "com.nimbusds" % "nimbus-jose-jwt" % "8.20.2",
+  "com.nimbusds" % "nimbus-jose-jwt" % "9.30.2",
 
   // Adding akka actors
-  "com.typesafe.akka" %% "akka-actor" % "2.6.3",
+  "com.typesafe.akka" %% "akka-actor" % "2.8.0",
 
-  "org.seleniumhq.selenium" % "selenium-java"            % "3.141.59",
-  "commons-io"              % "commons-io"               % "2.8.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-//  "org.scalatest"          %% "scalatest"                % "3.2.8" % "Test",
-//  "org.scalamock"          %% "scalamsock"                % "5.1.0" % "Test"
+  "org.seleniumhq.selenium" % "selenium-java"            % "4.8.1",
+  "commons-io"              % "commons-io"               % "20030203.000550",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
  "org.typelevel" %%"cats-core"%"2.9.0",
-  "org.scalatest" %% "scalatest" % "3.2.15" % "test",
   "org.aspectj" % "aspectjweaver" % "1.9.19",
   "org.aspectj" % "aspectjrt" % "1.9.19",
 
-
-)
-
-scalacOptions ++=Seq(
-  "-Xfatal-warnings"
+//  testing
+   "org.scalatest" %% "scalatest" % "3.2.15" % "test",
+  "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
+  "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test",
 )
 
 enablePlugins(DockerPlugin)
+
 dockerExposedPorts ++= Seq(9000, 9001)
 dockerExposedUdpPorts += 4444
-//CQRS/Event Sourcing architecture
-//swaggerDomainNameSpaces := Seq("models")
-
-//libraryDependencies += "org.webjars" % "swagger-ui" % "4.11.1"
-

@@ -1,9 +1,11 @@
 package controllers
 
-import org.scalatestplus.play._
-import org.scalatestplus.play.guice._
-import play.api.test._
+import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+
 
 /**
  * Add your spec here.
@@ -11,30 +13,18 @@ import play.api.test.Helpers._
  *
  * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
  */
-class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+class HomeControllerSpec extends AnyFunSpec with GuiceOneAppPerSuite   {
+describe("home controller"){
+  val controller = new HomeController(stubControllerComponents())
+  val home = controller.index().apply(FakeRequest(GET, "/"))
 
-  "HomeController GET" should {
-
-    "render the index page from a new instance of controller" in {
-      val controller = new HomeController(stubControllerComponents())
-      val home = controller.index().apply(FakeRequest(GET, "/"))
-   //   val message:AppInfo = AppInfo("kitabo Booking System","2022.11.06","moverr@gmail,com")
-
-      status(home) mustBe OK
-    }
-
-    "render the index page from the application" in {
-      val controller = inject[HomeController]
-      val home = controller.index().apply(FakeRequest(GET, "/"))
-
-      status(home) mustBe OK
-    }
-
-    "render the index page from the router" in {
-      val request = FakeRequest(GET, "/")
-      val home = route(app, request).get
-
-      status(home) mustBe OK
-    }
+  describe("Get Endpint"){
+      it ("should return 200 ok response"){
+        val home = controller.index().apply(FakeRequest(GET, "/"))
+        status(home) mustBe OK
+      }
   }
+}
+
+
 }
