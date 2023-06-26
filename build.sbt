@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-json" % "2.8.0-M5",
   "com.typesafe.slick" %% "slick" % "3.2.1",
   "com.typesafe.play" %% "play-slick" % "4.0.2",
-  "org.scalactic" %% "scalactic" % "3.2.0",
+
   "com.typesafe.slick" %% "slick-codegen" % "3.3.2",
   "com.github.tminglei" %% "slick-pg" % "0.19.3",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
@@ -37,8 +37,13 @@ libraryDependencies ++= Seq(
 
   // Adding akka actors
   "com.typesafe.akka" %% "akka-actor" % "2.8.0",
+  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.0",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.8.0",
+  "com.typesafe.akka" %% "akka-protobuf-v3" % "2.8.0",
+  "com.typesafe.akka" %% "akka-stream" % "2.8.0",
+  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.8.0",
+  //akka-actor-typed, akka-slf4j, akka-protobuf-v3, akka-stream, akka-serialization-jackson]
 
-  "org.seleniumhq.selenium" % "selenium-java"            % "4.8.1",
   "commons-io"              % "commons-io"               % "20030203.000550",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
  "org.typelevel" %%"cats-core"%"2.9.0",
@@ -46,10 +51,13 @@ libraryDependencies ++= Seq(
   "org.aspectj" % "aspectjrt" % "1.9.19",
 
 //  testing
+  "org.scalactic" %% "scalactic" % "3.2.15",
    "org.scalatest" %% "scalatest" % "3.2.15" % "test",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
   "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test",
+  "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"
 )
+
 
 enablePlugins(DockerPlugin)
 
