@@ -4,6 +4,8 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 
+import java.time.LocalDate
+import java.time.format._
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -20,7 +22,12 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    */
   case class AppInfo(name:String,version:String,author:String)
   def index() = Action { implicit request: Request[AnyContent] =>
-    val message:AppInfo = AppInfo("kitabo Booking System","2022.11.06","moverr@gmail,com")
+    val currentTtime:LocalDate = LocalDate.now()
+    val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy ")
+    val currentDate:String =formatter.format(currentTtime)
+    //2022.11.06"
+    val initialDate = "2022.11.06"
+    val message:AppInfo = AppInfo(s"kitabo Booking System API",s"$initialDate - $currentDate","moverr@gmail,com")
 
     Ok(views.html.index(message.name)(message.author)(message.version))
   }
