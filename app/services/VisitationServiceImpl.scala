@@ -5,8 +5,7 @@ import controllers.responses._
 import models.daos.{TVisitationDAO, VisitationDAO}
 import models.entities.VisitationEntity
 import org.joda.time.{DateTime, DateTimeZone}
-import services.interfaces.TVisitationService
-import utils._
+
 
 import java.sql.Timestamp
 import javax.inject.Inject
@@ -47,10 +46,6 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
     response.map(value => value.map(optionValue => populate(optionValue)))
   }
 
-  override def archive(id: Long): Unit = {
-
-    ???
-  }
 
   def delete(id: Long): Future[Either[Throwable,Boolean]] = {
     val response: Future[Option[VisitationEntity]] = visitationDao.get(id)

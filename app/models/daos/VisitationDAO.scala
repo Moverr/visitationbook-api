@@ -57,8 +57,8 @@ class VisitationDAO  @Inject()
 
 
   def archive(id: Long): Any = {
-    //val query = visitationTable.filter(_.id === id).map(_.status=="archived").update()
-     ???
+    val query = visitationTable.filter(_.id === id).map(_.status).update("ARCHIVED")
+    db.run(query)
 
   }
 }

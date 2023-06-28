@@ -30,8 +30,8 @@ class VisitationController @Inject()(
       match {
         case Left(exception) =>
           exception match {
-            case e:RuntimeException =>  Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST,exception.getMessage))))
-            case _ =>  Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR,"Internal Sever Error"))))
+            case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
+            case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
           }
 
         case Right(result) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
@@ -62,15 +62,15 @@ class VisitationController @Inject()(
   }
 
 
-  def delete(id:Long) = Action.async  { implicit  request =>
-    val res =service.delete(id);
+  def delete(id: Long) = Action.async { implicit request =>
+    val res = service.delete(id);
     res.flatMap {
       case Left(exception) =>
         exception match {
           case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
           case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
-      case Right(value) =>  Future.successful(Ok)
+      case Right(value) => Future.successful(Ok)
     }
 
   }
