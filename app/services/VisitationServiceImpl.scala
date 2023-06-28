@@ -36,6 +36,7 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
 
   //todo: lists
   override def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] = {
+
     val response: Future[Seq[VisitationEntity]] = visitationDao.list(offset, limit)
     response.map(futureResponse => futureResponse.map(record => populate(record)))
   }
@@ -51,8 +52,16 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
     ???
   }
 
-  def delete(id: Long): Unit = {
-    visitationDao.delete(id)
+  def delete(id: Long): Future[Either[Throwable,Boolean]] = {
+    val response: Future[Option[VisitationEntity]] = visitationDao.get(id)
+    response.map {
+      case Some(value) =>
+        visitationDao.delete(value.id)
+        Right(true)
+
+      case None => Left(new RuntimeException("Record does not exist"))
+    }
+
   }
 
   override def populate(entity: VisitationEntity): VisitationResponse =

@@ -6,7 +6,7 @@ import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
 import controllers.responses.VisitationResponseWrites._
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import play.api.libs.json.Json
-import play.api.mvc.{BaseController, ControllerComponents}
+import play.api.mvc.{BaseController, ControllerComponents, WrappedRequest}
 import services.VisitationServiceImpl
 
 import javax.inject.{Inject, Singleton}
@@ -62,7 +62,16 @@ class VisitationController @Inject()(
   }
 
 
-  def archive(): Unit = {
+  def delete(id:Long) = Action.async  { implicit  request =>
+    val res =service.delete(id);
+    res.flatMap {
+      case Left(exception) =>
+        exception match {
+          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
+          case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+        }
+      case Right(value) =>  Future.successful(Ok)
+    }
 
   }
 

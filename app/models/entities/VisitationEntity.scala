@@ -26,7 +26,7 @@ case class VisitationEntity(id:Long, hostId:Option[Long], guestId:Option[Long], 
 
     def timeOut = column[Option[Timestamp]]("time_out")
 
-    def status = column[String]("status")
+    def status = column[String]("status",O.Default("PENDING"))
 
     def timezone = column[Option[String]]("timezone")
 
