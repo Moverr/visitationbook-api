@@ -20,7 +20,7 @@ case class visitationRequestEntity(id:Long
                                    invType:Option[String],
                                    dateCreated:Timestamp,
                                    createdBy:Option[Long],
-                                   updatedAt:Timestamp
+                                   updatedAt:Option[Timestamp]
                                    , updatedBy:Option[Long]
                                   ,startDate:Option[Timestamp]
                                   ,endDate:Option[Timestamp]

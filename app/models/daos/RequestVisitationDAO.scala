@@ -14,7 +14,7 @@ import scala.concurrent.impl.Promise
 
 
 @Singleton
-class VisitationRequestDAO    @Inject()(private val dbConfigProvider: DatabaseConfigProvider)   (implicit executionContext: ExecutionContext)
+class RequestVisitationDAO    @Inject()(private val dbConfigProvider: DatabaseConfigProvider)(implicit executionContext: ExecutionContext)
 {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
@@ -56,7 +56,7 @@ class VisitationRequestDAO    @Inject()(private val dbConfigProvider: DatabaseCo
 
 
   def archive(id: Long): Any = {
-    //val query = visitationTable.filter(_.id === id).map(_.st).update("ARCHIVED")
+    //val query = visitationRequestTable.filter(_.id === id).map(_.status).update("ARCHIVED")
     //db.run(query)
 
   }
