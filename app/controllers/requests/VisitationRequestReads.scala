@@ -18,7 +18,7 @@ object VisitationRequestReads {
       (JsPath \ "time_in").read[String] and
       (JsPath \ "time_out").read[String] and
       (JsPath \ "status").read[String] and
-      (JsPath \ "timezone").read[String]
+      (JsPath \ "timezone").readNullable[String]
     ) (VisitationsRequest.apply _)
 
 }

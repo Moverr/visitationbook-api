@@ -2,7 +2,7 @@ package services.interfaces
 
 import controllers.requests.VisitationsRequest
 import controllers.responses.VisitationResponse
-import models.entities.Visitation
+import models.entities.VisitationEntity
 
 import scala.concurrent.Future
 
@@ -19,5 +19,5 @@ trait TVisitationService {
 
   def archive(id: Long): Unit
 
-  def populate(entity: Visitation): VisitationResponse
+  def populate(entity: VisitationEntity): VisitationResponse
 }

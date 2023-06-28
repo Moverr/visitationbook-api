@@ -15,9 +15,9 @@ object VisitationResponseWrites {
         (JsPath \ "timeIn").write[Option[String]] and
         (JsPath \ "timeOut").write[Option[String]] and
         (JsPath \ "status").write[String] and
-        (JsPath \ "timezone").write[String] and
-        (JsPath \ "created_at").write[Timestamp] and
-        (JsPath \ "updated_at").write[Timestamp]
+        (JsPath \ "timezone").write[Option[String]] and
+        (JsPath \ "created_at").write[Option[Timestamp]] and
+        (JsPath \ "updated_at").write[Option[Timestamp]]
       ) (unlift(VisitationResponse.unapply))
 
 

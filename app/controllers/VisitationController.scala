@@ -25,8 +25,8 @@ class VisitationController @Inject()(
     try {
 
       val json = request.body.asJson.get
-      val record: VisitationsRequest = json.as[VisitationsRequest]
-      service.create(record)
+      val visitationsRequest: VisitationsRequest = json.as[VisitationsRequest]
+      service.create(visitationsRequest)
       match {
         case Left(exception) =>
           exception match {

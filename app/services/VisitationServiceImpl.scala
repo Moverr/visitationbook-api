@@ -3,7 +3,7 @@ package services
 import controllers.requests.VisitationsRequest
 import controllers.responses._
 import models.daos.{TVisitationDAO, VisitationDAO}
-import models.entities.Visitation
+import models.entities.VisitationEntity
 import org.joda.time.{DateTime, DateTimeZone}
 import services.interfaces.TVisitationService
 import utils._
@@ -17,26 +17,32 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
   //todo: create
   override def create(request: VisitationsRequest):  Either[Throwable,Future[VisitationResponse]] = {
     //validate request
-    val timeOutDate:DateTime =   DateTime.parse(request.timeOut);
+    val timeOutDate:DateTime =   DateTime.parse(request.timeOut)
     val timeInDate:DateTime =  DateTime.parse(request.timeIn)
+    val  currentDate = DateTime.now(DateTimeZone.forID(request.timezone.getOrElse("UTC")))
+
+
+    if(timeInDate.isBefore(currentDate)){
+      return Left(new RuntimeException("Enter current time"))
+    }
     if(timeInDate.isAfter(timeOutDate)){
       return Left(new RuntimeException("Time In should be less than Time Out "))
     }
 
-    val visit: Visitation =   Visitation(0L,request.hostId, request.guestId, request.officeId, request.departmentId, Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status, request.timezone, new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis), new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis))
-    val response: Future[Visitation] = visitationDao.create(visit)
+    val visit: VisitationEntity =   VisitationEntity(0L,request.hostId, request.guestId, request.officeId, request.departmentId, Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status, request.timezone, Some(new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis)), Some(new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis)))
+    val response: Future[VisitationEntity] = visitationDao.create(visit)
     Right(response.map(record => populate(record)))
   }
 
   //todo: lists
   override def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] = {
-    val response: Future[Seq[Visitation]] = visitationDao.list(offset, limit)
+    val response: Future[Seq[VisitationEntity]] = visitationDao.list(offset, limit)
     response.map(futureResponse => futureResponse.map(record => populate(record)))
   }
 
   //todo: get by id
   override def getById(id: Long): Future[Option[VisitationResponse]] = {
-    val response: Future[Option[Visitation]] = visitationDao.get(id)
+    val response: Future[Option[VisitationEntity]] = visitationDao.get(id)
     response.map(value => value.map(optionValue => populate(optionValue)))
   }
 
@@ -49,7 +55,7 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
     visitationDao.delete(id)
   }
 
-  override def populate(entity: Visitation): VisitationResponse =
+  override def populate(entity: VisitationEntity): VisitationResponse =
     VisitationResponse(
       entity.id
       , entity.hostId

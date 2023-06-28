@@ -1,15 +1,16 @@
 package controllers
 
-import javax.inject._
-import play.api._
+
 import play.api.mvc._
 
 import java.time.LocalDate
 import java.time.format._
+import javax.inject._
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
  */
+
 @Singleton
 class HomeController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
 
@@ -21,6 +22,8 @@ class HomeController @Inject()(val controllerComponents: ControllerComponents) e
    * a path of `/`.
    */
   case class AppInfo(name:String,version:String,author:String)
+
+
   def index() = Action { implicit request: Request[AnyContent] =>
     val currentTtime:LocalDate = LocalDate.now()
     val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy ")

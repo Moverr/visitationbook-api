@@ -1,7 +1,7 @@
 package models.daos
 
 
-import models.entities.{Visitation, VisitationTable}
+import models.entities.{VisitationEntity, VisitationTable}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
@@ -24,23 +24,23 @@ class VisitationDAO  @Inject()
   import dbConfig._
 
   //todo: create
-  override def create(visitation: Visitation): Future[Visitation] = {
+  override def create(visitation: VisitationEntity): Future[VisitationEntity] = {
     val query = visitationTable.returning(visitationTable) += visitation
     db.run(query)
   }
 
   //todo: list
-  override def list(offset: Long, limit: Long): Future[Seq[Visitation]] = {
+  override def list(offset: Long, limit: Long): Future[Seq[VisitationEntity]] = {
     db.run(visitationTable.sortBy(_.created_at).take(offset).drop(limit).result)
   }
 
   //todo: get by id
-  override def get(id: Long): Future[Option[Visitation]] = {
+  override def get(id: Long): Future[Option[VisitationEntity]] = {
     db.run(visitationTable.filter(_.id === id).result.headOption)
   }
 
   //todo: update
-  override def update(id: Long, visitation: Visitation): Future[Visitation] = {
+  override def update(id: Long, visitation: VisitationEntity): Future[VisitationEntity] = {
 
     val query = visitationTable.filter(_.id === id).update(visitation)
     db.run(query)

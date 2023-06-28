@@ -55,15 +55,10 @@ libraryDependencies ++= Seq(
    "org.scalatest" %% "scalatest" % "3.2.15" % "test",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
   "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test",
-  "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test",
-
-  //swagger
-  "com.wordnik" %% "swagger-play2" % "1.3.12" exclude("org.reflections", "reflections"), "org.reflections" % "reflections" % "0.9.8" notTransitive (), "org.webjars" % "swagger-ui" % "2.1.8-M1"
+  "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"
 
 )
 
-
-enablePlugins(DockerPlugin)
 
 dockerExposedPorts ++= Seq(9000, 9001)
 dockerExposedUdpPorts += 4444
