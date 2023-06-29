@@ -1,6 +1,6 @@
 package services
 
-import controllers.requests.VisitationsRequest
+import controllers.requests.VistationRequest
 import controllers.responses._
 import models.daos.VisitationDAO
 import models.entities.VisitationEntity
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) {
 
-   def create(request: VisitationsRequest):  Either[Throwable,Future[VisitationResponse]] = {
+   def create(request: VistationRequest):  Either[Throwable,Future[VisitationResponse]] = {
     val timeOutDate:DateTime =   DateTime.parse(request.timeOut)
     val timeInDate:DateTime =  DateTime.parse(request.timeIn)
     val  currentDate = DateTime.now(DateTimeZone.forID(request.timezone.getOrElse("UTC")))

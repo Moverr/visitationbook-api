@@ -1,6 +1,6 @@
 package controllers
 
-import controllers.requests.VisitationsRequest
+import controllers.requests.VistationRequest
 import controllers.requests.VisitationRequestReads.visitationRequestReads
 import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
 import controllers.responses.VisitationResponseWrites._
@@ -25,7 +25,7 @@ class VisitationController @Inject()(
     try {
 
       val json = request.body.asJson.get
-      val visitationsRequest: VisitationsRequest = json.as[VisitationsRequest]
+      val visitationsRequest: VistationRequest = json.as[VistationRequest]
       service.create(visitationsRequest)
       match {
         case Left(exception) =>

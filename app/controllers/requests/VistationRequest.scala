@@ -6,7 +6,7 @@ import models.VisitationStatus.VisitationStatus
 import play.api.libs.json._
 
 
-case class VisitationsRequest(
+case class VistationRequest(
                                hostId: Option[Long],
                                guestId: Option[Long],
                                officeId: Option[Long],

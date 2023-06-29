@@ -1,6 +1,6 @@
 package models.daos
 
-import controllers.requests.RequestVisitation
+import controllers.requests.VisitRequest
 import models.entities.{VisitationRequestTable, visitationRequestEntity}
 import play.api.db.slick.DatabaseConfigProvider
 

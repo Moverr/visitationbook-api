@@ -1,6 +1,6 @@
 package services
 
-import controllers.requests.{RequestVisitation, VisitationsRequest}
+import controllers.requests.{VisitRequest, VistationRequest}
 import controllers.responses.VisitationResponse
 import models.daos.RequestVisitationDAO
 import models.entities.{VisitationEntity, visitationRequestEntity}
@@ -10,9 +10,10 @@ import java.sql.Timestamp
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class RequestVisitationServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
-  def create(request: RequestVisitation): Either[Throwable, Future[VisitationResponse]] = {
+  def create(request: VisitRequest): Either[Throwable, Future[VisitationResponse]] = {
     val timeOutDate: DateTime = DateTime.parse(request.timeOut)
     val timeInDate: DateTime = DateTime.parse(request.timeIn)
 
@@ -26,7 +27,6 @@ class RequestVisitationServiceImpl @Inject()(requestVisitationDao: RequestVisita
   }
 
   def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] = {
-
     val response: Future[Seq[visitationRequestEntity]] = requestVisitationDao.list(offset, limit)
     response.map(futureResponse => futureResponse.map(record => populate(record)))
   }
