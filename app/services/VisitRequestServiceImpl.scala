@@ -1,7 +1,7 @@
 package services
 
 import controllers.requests.{VisitRequest, VistationRequest}
-import controllers.responses.VisitationResponse
+import controllers.responses.{VisitResponse, VisitationResponse}
 import models.daos.RequestVisitationDAO
 import models.entities.{VisitationEntity, visitationRequestEntity}
 
@@ -13,7 +13,7 @@ import java.sql.Timestamp
 @Singleton
 class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
-  def create(request: VisitRequest): Either[Throwable, Future[VisitationResponse]] = {
+  def create(request: VisitRequest): Either[Throwable, Future[VisitResponse]] = {
     val timeOutDate: Option[DateTime] = request.timeIn.map(x=>DateTime.parse(x))
     //DateTime.parse(request.timeOut)
     val timeInDate: Option[DateTime]  = request.timeOut.map(x => DateTime.parse(x))
@@ -24,12 +24,12 @@ class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationD
     Right(response.map(record => populate(record)))
   }
 
-  def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] = {
+  def list(offset: Long, limit: Long): Future[Seq[VisitResponse]] = {
     val response: Future[Seq[visitationRequestEntity]] = requestVisitationDao.list(offset, limit)
     response.map(futureResponse => futureResponse.map(record => populate(record)))
   }
 
-  def getById(id: Long): Future[Option[VisitationResponse]] = {
+  def getById(id: Long): Future[Option[VisitResponse]] = {
     val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
     response.map(value => value.map(optionValue => populate(optionValue)))
   }
@@ -47,7 +47,7 @@ class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationD
 
   }
 
-  def populate(entity: visitationRequestEntity): VisitationResponse = {
+  def populate(entity: visitationRequestEntity): VisitResponse = {
     ???
   }
 
