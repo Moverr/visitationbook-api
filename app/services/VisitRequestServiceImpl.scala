@@ -4,24 +4,22 @@ import controllers.requests.{VisitRequest, VistationRequest}
 import controllers.responses.VisitationResponse
 import models.daos.RequestVisitationDAO
 import models.entities.{VisitationEntity, visitationRequestEntity}
+
+import javax.inject.Inject
+import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.{DateTime, DateTimeZone}
 
 import java.sql.Timestamp
-import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
-
 @Singleton
 class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
   def create(request: VisitRequest): Either[Throwable, Future[VisitationResponse]] = {
-    val timeOutDate: DateTime = DateTime.parse(request.timeOut)
-    val timeInDate: DateTime = DateTime.parse(request.timeIn)
+    val timeOutDate: Option[DateTime] = request.timeIn.map(x=>DateTime.parse(x))
+    //DateTime.parse(request.timeOut)
+    val timeInDate: Option[DateTime]  = request.timeOut.map(x => DateTime.parse(x))
 
-    if (timeInDate.isAfter(timeOutDate)) {
-      return Left(new RuntimeException("Time In should be less than Time Out "))
-    }
 
-    val visit: visitationRequestEntity = visitationRequestEntity(0L, request.hostId, request.guestId, request.officeId, request.departmentId,request.invitationType, new Timestamp(System.currentTimeMillis()),None,None,None,Some(new Timestamp(timeInDate.getMillis)),Some(new Timestamp(timeInDate.getMillis)) )
+    val visit: visitationRequestEntity = visitationRequestEntity(0L, request.hostId, request.guestId, request.officeId, request.departmentId,request.invitationType, new Timestamp(System.currentTimeMillis()),None,None,None, timeInDate.map(x=>new Timestamp(x.getMillis)),timeOutDate.map(x=>new Timestamp(x.getMillis)) )
     val response: Future[visitationRequestEntity] = requestVisitationDao.create(visit)
     Right(response.map(record => populate(record)))
   }
