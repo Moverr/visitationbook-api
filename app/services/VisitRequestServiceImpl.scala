@@ -11,7 +11,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RequestVisitationServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
+class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
   def create(request: VisitRequest): Either[Throwable, Future[VisitationResponse]] = {
     val timeOutDate: DateTime = DateTime.parse(request.timeOut)

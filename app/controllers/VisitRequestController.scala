@@ -4,7 +4,7 @@ import controllers.requests.{VisitRequest, VistationRequest}
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
-import services.{RequestVisitationServiceImpl, VisitationServiceImpl}
+import services.{VisitRequestServiceImpl, VisitationServiceImpl}
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -12,7 +12,7 @@ import scala.concurrent.Future
 @Singleton
 class VisitRequestController @Inject()(
                                              val controllerComponents: ControllerComponents,
-                                             val service: RequestVisitationServiceImpl
+                                             val service: VisitRequestServiceImpl
                                            ) extends BaseController {
 
 
