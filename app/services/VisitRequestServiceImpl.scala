@@ -47,7 +47,8 @@ class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationD
   }
 
   def populate(entity: visitationRequestEntity): VisitResponse = {
-    ???
+     val response:VisitResponse  = VisitResponse(entity.id,entity.hostId,entity.guestId,entity.officeId,entity.departmentId,entity.startDate.map(x=>x.toString),entity.endDate.map(x=>x.toString),entity.invType);
+    response
   }
 
 }

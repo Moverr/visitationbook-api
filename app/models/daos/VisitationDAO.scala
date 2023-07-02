@@ -34,7 +34,7 @@ class VisitationDAO  @Inject()
 //    val query = for{
 //      (visitation,host,guest)<-
 //    }
-    db.run(visitationTable.sortBy(_.created_at).take(offset).drop(limit).result)
+    db.run(visitationTable.sortBy(_.created_at).drop(offset).take(limit).result)
   }
 
   //todo: get by id

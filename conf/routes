@@ -7,7 +7,7 @@
 GET     /                           controllers.HomeController.index()
 #visisttatins
 POST /v1/visitation                 controllers.VisitationController.create()
-GET /v1/visitation/list             controllers.VisitationController.list(limit:Long=10L,offset:Long=0L)
+GET /v1/visitation/list             controllers.VisitationController.list(limit:Long,offset:Long)
 GET /v1/visitation/:id              controllers.VisitationController.getById(id:Long)
 DELETE /v1/visitation/:id           controllers.VisitationController.delete(id:Long)
 

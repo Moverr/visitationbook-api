@@ -31,11 +31,9 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
     Right(response.map(record => populate(record)))
   }
 
-   def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] = {
+   def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] =   visitationDao.list(offset, limit)
+       .map(futureResponse => futureResponse.map(record => populate(record)))
 
-    val response: Future[Seq[VisitationEntity]] = visitationDao.list(offset, limit)
-    response.map(futureResponse => futureResponse.map(record => populate(record)))
-  }
 
    def getById(id: Long): Future[Option[VisitationResponse]] = {
     val response: Future[Option[VisitationEntity]] = visitationDao.get(id)

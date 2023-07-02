@@ -33,7 +33,7 @@ class RequestVisitationDAO    @Inject()(private val dbConfigProvider: DatabaseCo
     //    val query = for{
     //      (visitation,host,guest)<-
     //    }
-    db.run(visitationRequestTable.sortBy(_.dateCreated).take(offset).drop(limit).result)
+    db.run(visitationRequestTable.sortBy(_.dateCreated).drop(offset).take(limit).result)
   }
 
   //todo: get by id
