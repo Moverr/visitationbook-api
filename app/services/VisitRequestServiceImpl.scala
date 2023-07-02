@@ -1,15 +1,14 @@
 package services
 
-import controllers.requests.{VisitRequest, VistationRequest}
-import controllers.responses.{VisitResponse, VisitationResponse}
+import controllers.requests.VisitRequest
+import controllers.responses.VisitResponse
 import models.daos.RequestVisitationDAO
-import models.entities.{VisitationEntity, visitationRequestEntity}
-
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
-import org.joda.time.{DateTime, DateTimeZone}
+import models.entities.visitationRequestEntity
+import org.joda.time.DateTime
 
 import java.sql.Timestamp
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
