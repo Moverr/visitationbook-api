@@ -2,12 +2,15 @@ package controllers
 
 import controllers.requests.VisitRequest
 import controllers.requests.VisitRequestReads.visitRequestReads
-import controllers.responses.{ErrorRespnse, VisitationResponse}
+import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
+import controllers.responses.VisitResponseWrites.VisitationResponseWrites
+import controllers.responses.{ErrorRespnse, VisitResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{BaseController, ControllerComponents}
-import services.{VisitRequestServiceImpl, VisitationServiceImpl}
+import services.VisitRequestServiceImpl
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
@@ -31,7 +34,7 @@ class VisitRequestController @Inject()(
             case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
           }
 
-        case Right(result) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
+        case Right(result:Future[VisitResponse]) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
       }
 
     }
@@ -41,13 +44,13 @@ class VisitRequestController @Inject()(
   }
 
   def list(limit: Long, offset: Long) = Action.async { implicit request =>
-    val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
+    val response: Future[Seq[VisitResponse]] = service.list(limit, offset)
     response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
   }
 
 
   def getById(id: Long) = Action.async { implicit request =>
-    val response: Future[Option[VisitationResponse]] = service.getById(id)
+    val response: Future[Option[VisitResponse]] = service.getById(id)
     response.flatMap(
       value =>
         value match {

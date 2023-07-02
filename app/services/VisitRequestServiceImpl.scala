@@ -5,7 +5,7 @@ import controllers.responses.{VisitResponse, VisitationResponse}
 import models.daos.RequestVisitationDAO
 import models.entities.{VisitationEntity, visitationRequestEntity}
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import org.joda.time.{DateTime, DateTimeZone}
 

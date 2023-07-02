@@ -36,7 +36,7 @@ class VisitationRequestTable(tag:Tag) extends  Table[visitationRequestEntity] (t
   def invType = column[Option[String]]("inv_type")
   def dateCreated = column[Timestamp]("date_created", SqlType("timestamp not null default CURRENT_TIMESTAMP "))
   def createdBy = column[Option[Long]]("created_by")
-  def dateUpdated = column[Timestamp]("date_updated", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
+  def dateUpdated = column[Option[Timestamp]]("date_updated", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
   def updatedBy = column[Option[Long]]("updated_by")
 
   def startDate = column[Option[Timestamp]]("start_date")

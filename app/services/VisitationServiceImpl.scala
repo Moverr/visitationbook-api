@@ -7,7 +7,7 @@ import models.entities.VisitationEntity
 import org.joda.time.{DateTime, DateTimeZone}
 
 import java.sql.Timestamp
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

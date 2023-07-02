@@ -12,13 +12,13 @@ object VisitResponseWrites {
     (JsPath \ "id").write[Long] and
       (JsPath \ "host_id").write[Option[Long]] and
       (JsPath \ "guest_id").write[Option[Long]] and
+      (JsPath \ "office_id").write[Option[Long]] and
+      (JsPath \ "departmemnt_id").write[Option[Long]] and
       (JsPath \ "time_in").write[Option[String]] and
       (JsPath \ "time_out").write[Option[String]] and
-      (JsPath \ "status").write[String] and
-      (JsPath \ "timezone").write[Option[String]] and
-      (JsPath \ "created_at").write[Option[Timestamp]] and
-      (JsPath \ "updated_at").write[Option[Timestamp]]
-    ) (unlift(VisitationResponse.unapply))
+      (JsPath \ "invitation_type").write[Option[String]]
+
+    ) (unlift(VisitResponse.unapply))
 
 
 
