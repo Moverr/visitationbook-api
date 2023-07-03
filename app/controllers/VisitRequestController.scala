@@ -44,7 +44,7 @@ class VisitRequestController @Inject()(
   }
 
   def list(limit: Long, offset: Long) = Action.async { implicit request =>
-    val response: Future[Seq[VisitResponse]] = service.list(limit, offset)
+    val response: Future[Seq[VisitResponse]] = service.list( offset,limit)
     response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
   }
 

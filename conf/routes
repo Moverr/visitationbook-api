@@ -13,7 +13,7 @@ DELETE /v1/visitation/:id           controllers.VisitationController.delete(id:L
 
 #requestttvisitations
 POST /v1/request/visit                 controllers.VisitRequestController.create()
-GET /v1/request/visit/list             controllers.VisitRequestController.list(limit:Long=10L,offset:Long=0L)
+GET /v1/request/visit/list             controllers.VisitRequestController.list(limit:Long,offset:Long)
 GET /v1/request/visit/:id              controllers.VisitRequestController.getById(id:Long)
 DELETE /v1/request/visit/:id           controllers.VisitRequestController.delete(id:Long)
 
