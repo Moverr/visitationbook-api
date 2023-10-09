@@ -7,12 +7,14 @@ import java.sql.Timestamp
 
 import HostResponseWrites._
 import  GuestResponseWrites._
+import  OfficeResponseWrites._
 
 object RequestVisitResponseWrites {
   implicit val requestVisitResponseWrites:Writes[RequestVisitResponse]=(
     (JsPath \ "id").write[Long] and
-      (JsPath \ "hostId").write[Option[HostReponse]] and
-      (JsPath \ "guestId").write[Option[GuestResponse]] and
+      (JsPath \ "host").write[Option[HostReponse]] and
+      (JsPath \ "guest").write[Option[GuestResponse]] and
+      (JsPath \ "office").write[Option[OfficeResponse]] and
       (JsPath \ "timeIn").write[Option[String]] and
       (JsPath \ "timeOut").write[Option[String]] and
       (JsPath \ "status").write[String] and
