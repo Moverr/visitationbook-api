@@ -6,9 +6,9 @@ import play.api.libs.json.{JsPath, Writes}
 object HostResponseWrites {
 
   implicit  val hostResponseWrites:Writes[HostReponse]=(
-    (JsPath \ "id").write[Option[Long]] and
-      (JsPath \ "first_name").write[Option[String]] and
-      (JsPath \ "last_name").write[Option[String]]
+    (JsPath \ "id").write[Long] and
+      (JsPath \ "first_name").write[String] and
+      (JsPath \ "last_name").write[String]
 
   )(unlift(HostReponse.unapply))
 }

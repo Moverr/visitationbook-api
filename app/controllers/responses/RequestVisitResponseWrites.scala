@@ -15,8 +15,8 @@ object RequestVisitResponseWrites {
       (JsPath \ "host").write[Option[HostReponse]] and
       (JsPath \ "guest").write[Option[GuestResponse]] and
       (JsPath \ "office").write[Option[OfficeResponse]] and
-      (JsPath \ "timeIn").write[Option[String]] and
-      (JsPath \ "timeOut").write[Option[String]] and
+      (JsPath \ "start_date").write[Option[String]] and
+      (JsPath \ "end_date").write[Option[String]] and
       (JsPath \ "status").write[String] and
       (JsPath \ "timezone").write[Option[String]] and
       (JsPath \ "created_at").write[Option[Timestamp]] and
