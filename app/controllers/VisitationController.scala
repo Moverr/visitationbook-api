@@ -34,7 +34,10 @@ class VisitationController @Inject()(
             case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
           }
 
-        case Right(result) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
+        case Right(result) => result.flatMap(response => Future.successful(
+          Ok(Json.toJson(response)
+
+          )))
       }
 
     }
@@ -45,7 +48,15 @@ class VisitationController @Inject()(
 
   def list(limit: Long, offset: Long) = Action.async { implicit request =>
     val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
-    response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
+    response.flatMap(value => Future.successful(
+      Ok(Json.toJson(value))
+        .withHeaders(
+          "Access-Control-Allow-Origin" -> "http://localhost:3000",
+          "Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE",
+          "Access-Control-Allow-Headers" -> "Content-Type, Authorization"
+        )
+
+    ))
   }
 
 

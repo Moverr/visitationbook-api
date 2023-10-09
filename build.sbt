@@ -11,6 +11,7 @@ scalaVersion := "2.13.3"
 maintainer := "moverr@gmail.com"
 
 lazy val postgresversion = "9.4-1201-jdbc41"
+
 libraryDependencies ++= Seq(
   jdbc,
   guice,
@@ -18,6 +19,7 @@ libraryDependencies ++= Seq(
   javaJpa,
   ws,
   caffeine,
+  filters,
   "org.hibernate" % "hibernate-core" % "5.4.9.Final",
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "org.scalactic" %% "scalactic" % "3.2.2",
@@ -58,6 +60,7 @@ libraryDependencies ++= Seq(
   "org.scalatestplus" %% "mockito-4-6" % "3.2.15.0" % "test"
 
 )
+
 
 
 dockerExposedPorts ++= Seq(9000, 9001)
