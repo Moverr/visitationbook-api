@@ -1,10 +1,10 @@
 package controllers.requests;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
+import static java.lang.System.*;
 
 public class  Bingo {
 
@@ -12,7 +12,7 @@ public class  Bingo {
         Bingo cl = new Bingo();
         int[] result = cl
                 .countLOC("D:\\visitationbook\\visitationbook\\app\\controllers\\HomeController.scala");
-        System.out.println("The program CountLOC has " + result[0]
+        out.println("The program CountLOC has " + result[0]
                 + " lines of code and " + result[1] + " total lines");
     }
 
@@ -20,19 +20,18 @@ public class  Bingo {
         int lineCount = 0;
         int codeLineCount = 0;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(txt));
-            String line = reader.readLine();
-            while (line != null) {
-                lineCount++;
-                if (!isCommentLine(line)) {
-                    codeLineCount++;
+            try (BufferedReader reader = new BufferedReader(new FileReader(txt))) {
+                String line = reader.readLine();
+                while (line != null) {
+                    lineCount++;
+                    if (!isCommentLine(line)) {
+                        codeLineCount++;
+                    }
+                    line = reader.readLine();
                 }
-                line = reader.readLine();
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
+            out.println(e);
         }
 
         return new int[] { codeLineCount, lineCount };

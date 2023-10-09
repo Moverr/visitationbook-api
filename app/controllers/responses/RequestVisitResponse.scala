@@ -4,10 +4,11 @@ import java.sql.Timestamp
 
 case class RequestVisitResponse(
                                  id: Long,
-                                 host: Option[Long],
-                                 guest: Option[Long],
-                                 timeIn: Option[String],
-                                 timeOut: Option[String],
+                                 host: Option[HostReponse],
+                                 guest: Option[GuestResponse],
+                                 office: Option[OfficeResponse],
+                                 startDate: Option[String],
+                                 endDate: Option[String],
                                  status: String,
                                  timezone: Option[String],
                                  createdAt: Option[Timestamp],
