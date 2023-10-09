@@ -1,7 +1,7 @@
 package services
 
 import controllers.requests.VisitRequest
-import controllers.responses.VisitResponse
+import controllers.responses.{GuestResponse, HostReponse, RequestVisitResponse, VisitResponse}
 import models.daos.RequestVisitationDAO
 import models.entities.visitationRequestEntity
 import org.joda.time.DateTime
@@ -11,7 +11,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Ordered.orderingToOrdered
 @Singleton
-class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
+class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
   def create(request: VisitRequest): Either[Throwable, Future[VisitResponse]] = {
       //DateTime.parse(request.timeOut)
@@ -53,9 +53,19 @@ class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationD
 
   }
 
-  def populate(entity: visitationRequestEntity): VisitResponse = {
-     val response:VisitResponse  = VisitResponse(entity.id,entity.hostId,entity.guestId,entity.officeId,entity.departmentId,entity.startDate.map((x: Timestamp) =>x.toString),entity.endDate.map((x: Timestamp) =>x.toString),entity.invType);
+  def populate(entity: visitationRequestEntity): RequestVisitResponse = {
+     val response:RequestVisitResponse  = RequestVisitResponse(
+       entity.id,
+       populateHostResponse(entity.hostId),
+       populateGuestResponse(entity.guestId),
+       entity.officeId,
+       entity.departmentId,entity.startDate.map((x: Timestamp) =>x.toString),entity.endDate.map((x: Timestamp) =>x.toString),entity.invType,None,None,None)
     response
   }
+
+  private def populateGuestResponse(guestID:Option[Long]):GuestResponse=  GuestResponse(guestID,None,None)
+
+  private def populateHostResponse(hostID: Option[Long]): HostReponse = HostReponse(hostID, None, None)
+
 
 }

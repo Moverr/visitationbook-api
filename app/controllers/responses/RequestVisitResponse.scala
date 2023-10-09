@@ -6,6 +6,7 @@ case class RequestVisitResponse(
                                  id: Long,
                                  host: Option[HostReponse],
                                  guest: Option[GuestResponse],
+                                 office: Option[OfficeResponse],
                                  timeIn: Option[String],
                                  timeOut: Option[String],
                                  status: String,
