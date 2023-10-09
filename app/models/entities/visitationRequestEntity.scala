@@ -18,12 +18,12 @@ case class visitationRequestEntity(id:Long
                                    , officeId:Option[Long]
                                    , departmentId:Option[Long],
                                    invType:Option[String],
-                                   dateCreated:Timestamp,
+                                   createdAt:Timestamp,
                                    createdBy:Option[Long],
                                    updatedAt:Option[Timestamp]
                                    , updatedBy:Option[Long]
-                                  ,startDate:Option[Timestamp]
-                                  ,endDate:Option[Timestamp]
+                                   , startDate:Option[Timestamp]
+                                   , endDate:Option[Timestamp]
                             )
 
 class VisitationRequestTable(tag:Tag) extends  Table[visitationRequestEntity] (tag,"visitationrequests"){
