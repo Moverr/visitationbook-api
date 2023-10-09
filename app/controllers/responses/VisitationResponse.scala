@@ -5,8 +5,8 @@ import org.joda.time.DateTime
 import java.sql.Timestamp
 case class VisitationResponse(
                                id:Long,
-                               hostId:Option[Long],
-                               guestId:Option[Long],
+                               host:Option[Long],
+                               guest:Option[Long],
                                timeIn:Option[String],
                                timeOut:Option[String],
                                status:String,

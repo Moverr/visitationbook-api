@@ -9,14 +9,21 @@ import org.joda.time.DateTime
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
+import scala.math.Ordered.orderingToOrdered
 @Singleton
 class VisitRequestServiceImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext){
 
   def create(request: VisitRequest): Either[Throwable, Future[VisitResponse]] = {
-    val timeOutDate: Option[DateTime] = request.timeIn.map(x=>DateTime.parse(x))
-    //DateTime.parse(request.timeOut)
-    val timeInDate: Option[DateTime]  = request.timeOut.map(x => DateTime.parse(x))
+      //DateTime.parse(request.timeOut)
+    val timeInDate: Option[DateTime]  = request.timeIn.map(x => DateTime.parse(x))
+    val timeOutDate: Option[DateTime] = request.timeOut.map(x => DateTime.parse(x))
+    //todo:validate that the user does not enter the same records twice.
 
+    if(timeInDate.isDefined && timeOutDate.isDefined){
+      if(timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime()){
+        return Left(new RuntimeException("Time in Date is less than Time out Date"))
+      }
+    }
 
     val visit: visitationRequestEntity = visitationRequestEntity(0L, request.hostId, request.guestId, request.officeId, request.departmentId,request.invitationType, new Timestamp(System.currentTimeMillis()),None,None,None, timeInDate.map(x=>new Timestamp(x.getMillis)),timeOutDate.map(x=>new Timestamp(x.getMillis)) )
     val response: Future[visitationRequestEntity] = requestVisitationDao.create(visit)
