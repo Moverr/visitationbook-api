@@ -25,7 +25,7 @@ case class visitationRequestEntity(id: Long
                                   )
 
 class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](tag, "visitationrequests") {
-//  val profiles = TableQuery[ProfileTable]
+  val profile = TableQuery[ProfileTable]
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
 
   def hostId = column[Option[Long]]("host_id")
@@ -55,7 +55,8 @@ class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](ta
 
 
   //todo: host and guest extensiong
-//  def host = foreignKey("FK_Host", hostId, authors)(_.id, onDelete = ForeignKeyAction.Cascade)
+   def host = foreignKey("FK_Host", hostId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+  def guest = foreignKey("FK_Host", guestId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
 
 
 }
