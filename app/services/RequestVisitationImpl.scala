@@ -31,6 +31,29 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
     Right(response.map((record: visitationRequestEntity) => populate(record))(executionContext))
   }
 
+  def list(offset: Long, limit: Long): Future[Seq[RequestVisitResponse]] = {
+    val response: Future[Seq[visitationRequestEntity]] = requestVisitationDao.list(offset, limit)
+    response.map((futureResponse: _root_.scala.collection.immutable.Seq[_root_.models.entities.visitationRequestEntity]) => futureResponse.map((record: visitationRequestEntity) => populate(record)))(executionContext)
+  }
+
+  def getById(id: Long): Future[Option[RequestVisitResponse]] = {
+    val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
+    response.map((value: _root_.scala.Option[_root_.models.entities.visitationRequestEntity]) => value.map((optionValue: visitationRequestEntity) => populate(optionValue)))
+  }
+
+  def delete(id: Long): Future[Either[Throwable, Boolean]] = {
+    val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
+    response.map({
+      case Some(value: visitationRequestEntity) =>
+        requestVisitationDao.delete(value.id)
+        Right(true)
+
+      case None => Left(new RuntimeException("Record does not exist"))
+    })
+
+  }
+
+
   def populate(entity: visitationRequestEntity): RequestVisitResponse = {
     RequestVisitResponse(
       entity.id,
@@ -64,27 +87,7 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
     case None => None
   }
 
-  def list(offset: Long, limit: Long): Future[Seq[RequestVisitResponse]] = {
-    val response: Future[Seq[visitationRequestEntity]] = requestVisitationDao.list(offset, limit)
-    response.map((futureResponse: _root_.scala.collection.immutable.Seq[_root_.models.entities.visitationRequestEntity]) => futureResponse.map((record: visitationRequestEntity) => populate(record)))(executionContext)
-  }
 
-  def getById(id: Long): Future[Option[RequestVisitResponse]] = {
-    val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
-    response.map((value: _root_.scala.Option[_root_.models.entities.visitationRequestEntity]) => value.map((optionValue: visitationRequestEntity) => populate(optionValue)))
-  }
-
-  def delete(id: Long): Future[Either[Throwable, Boolean]] = {
-    val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
-    response.map({
-      case Some(value: visitationRequestEntity) =>
-        requestVisitationDao.delete(value.id)
-        Right(true)
-
-      case None => Left(new RuntimeException("Record does not exist"))
-    })
-
-  }
 
 
 }
