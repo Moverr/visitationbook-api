@@ -55,8 +55,8 @@ class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](ta
 
 
   //todo: host and guest extensiong
-   def host = foreignKey("FK_Host", hostId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
-  def guest = foreignKey("FK_Host", guestId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+    def host = foreignKey("FK_Host", hostId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+   def guest = foreignKey("FK_Host", guestId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
 
 
 }

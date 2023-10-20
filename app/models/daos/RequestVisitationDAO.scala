@@ -1,16 +1,12 @@
 package models.daos
 
-import controllers.requests.VisitRequest
-import models.entities.{VisitationRequestTable, visitationRequestEntity}
+import models.entities.{ProfileEntity, ProfileTable, VisitationRequestTable, visitationRequestEntity}
 import play.api.db.slick.DatabaseConfigProvider
-
-import javax.inject.{Inject, Singleton}
 import slick.jdbc.JdbcProfile
-import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.impl.Promise
 
 
 @Singleton
@@ -18,39 +14,45 @@ class RequestVisitationDAO    @Inject()(private val dbConfigProvider: DatabaseCo
 {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
-  lazy val visitationRequestTable = TableQuery[VisitationRequestTable]
+    val visitationRequets = TableQuery[VisitationRequestTable]
+    val profiles = TableQuery[ProfileTable]
 
   import dbConfig._
+  import profile.api._
 
-  //todo: create
    def create(visitation: visitationRequestEntity): Future[visitationRequestEntity] = {
-    val query = visitationRequestTable.returning(visitationRequestTable) += visitation
+    val query = visitationRequets.returning(visitationRequets) += visitation
     db.run(query)
   }
 
   //todo: lists
-    def list(offset: Long, limit: Long): Future[Seq[visitationRequestEntity]] = {
-    //    val query = for{
-    //      (visitation,host,guest)<-
-    //    }
-    db.run(visitationRequestTable.sortBy(_.dateCreated).drop(offset).take(limit).result)
+    def list(offset: Long, limit: Long): Future[Seq[ (visitationRequestEntity, Option[ProfileEntity],Option[ProfileEntity])]] = {
+
+      val basic = for {
+        ((a,b),c)<- visitationRequets
+        .joinLeft(profiles).on (_.hostId === _.id)
+         .joinLeft(profiles).on (_._1.guestId === _.id)
+
+      } yield (a,b,c)
+
+      db run (basic.drop(offset).take(limit).result)
   }
 
   //todo: get by id
   def get(id: Long): Future[Option[visitationRequestEntity]] = {
-    db.run(visitationRequestTable.filter(_.id === id).result.headOption)
+    db.run(visitationRequets.filter(_.id === id).result.headOption)
   }
 
   //todo: update
     def update(id: Long, visitation: visitationRequestEntity): Future[visitationRequestEntity] = {
 
-    val query = visitationRequestTable.filter(_.id === id).update(visitation)
+    val query = visitationRequets.filter(_.id === id).update(visitation)
     db.run(query)
     Future.successful(visitation)
   }
 
     def delete(id: Long): Any = {
-    val query = visitationRequestTable.filter(_.id === id).delete
+    val query = visitationRequets.filter(_.id === id).delete
     db.run(query)
   }
 

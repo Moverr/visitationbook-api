@@ -1,9 +1,9 @@
 package services
 
 import controllers.requests.VisitRequest
-import controllers.responses.{GuestResponse, HostReponse, OfficeResponse, RequestVisitResponse, VisitResponse}
+import controllers.responses.{ProfileResponse, HostReponse, OfficeResponse, RequestVisitResponse}
 import models.daos.RequestVisitationDAO
-import models.entities.visitationRequestEntity
+import models.entities.{ProfileEntity, visitationRequestEntity}
 import org.joda.time.DateTime
 
 import java.sql.Timestamp
@@ -32,13 +32,60 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
   }
 
   def list(offset: Long, limit: Long): Future[Seq[RequestVisitResponse]] = {
-    val response: Future[Seq[visitationRequestEntity]] = requestVisitationDao.list(offset, limit)
-    response.map((futureResponse: _root_.scala.collection.immutable.Seq[_root_.models.entities.visitationRequestEntity]) => futureResponse.map((record: visitationRequestEntity) => populate(record)))(executionContext)
+    val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.list(offset, limit)
+
+    response.map {
+      x => x.map(b => populate(b))
+    }
+
+  }
+
+  def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
+    RequestVisitResponse(
+      entity._1.id,
+      populateProfile(entity._2),
+      populateProfile(entity._3),
+      populateOfficeResponse(None),
+      entity._1.startDate.map((x: Timestamp) => x.toString)
+      , entity._1.endDate.map((x: Timestamp) => x.toString)
+      , "STATUS"
+      , None
+      , Some(entity._1.createdAt)
+      , entity._1.updatedAt
+    )
+
   }
 
   def getById(id: Long): Future[Option[RequestVisitResponse]] = {
     val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
     response.map((value: _root_.scala.Option[_root_.models.entities.visitationRequestEntity]) => value.map((optionValue: visitationRequestEntity) => populate(optionValue)))
+  }
+
+  def populate(entity: visitationRequestEntity): RequestVisitResponse = {
+    RequestVisitResponse(
+      entity.id,
+      populateProfile(None),
+      populateProfile(None),
+      populateOfficeResponse(entity.officeId),
+      entity.startDate.map((x: Timestamp) => x.toString)
+      , entity.endDate.map((x: Timestamp) => x.toString)
+      , "STATUS"
+      , None
+      , Some(entity.createdAt)
+      , entity.updatedAt
+    )
+
+  }
+
+  private def populateProfile(guestID: Option[ProfileEntity]): Option[ProfileResponse] =
+    guestID match {
+      case Some(value) => Some(ProfileResponse(value.id, "", ""))
+      case None => None
+    }
+
+  private def populateOfficeResponse(officeID: Option[Long]): Option[OfficeResponse] = officeID match {
+    case Some(value) => Some(OfficeResponse(value, ""))
+    case None => None
   }
 
   def delete(id: Long): Future[Either[Throwable, Boolean]] = {
@@ -52,42 +99,6 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
     })
 
   }
-
-
-  def populate(entity: visitationRequestEntity): RequestVisitResponse = {
-    RequestVisitResponse(
-      entity.id,
-      populateHostResponse(entity.hostId),
-      populateGuestResponse(entity.guestId),
-      populateOfficeResponse(entity.officeId),
-      entity.startDate.map((x: Timestamp) => x.toString)
-      , entity.endDate.map((x: Timestamp) => x.toString)
-      , "STATUS"
-      , None
-      , Some(entity.createdAt)
-      , entity.updatedAt
-    )
-
-  }
-
-  private def populateGuestResponse(guestID: Option[Long]): Option[GuestResponse] =
-    guestID match {
-      case Some(value) => Some(GuestResponse(value, "", ""))
-      case None => None
-    }
-
-  private def populateHostResponse(hostID: Option[Long]): Option[HostReponse] =
-    hostID match {
-      case Some(value) => Some(HostReponse(value, "", ""))
-      case None => None
-    }
-
-  private def populateOfficeResponse(officeID: Option[Long]): Option[OfficeResponse] = officeID match {
-    case Some(value) => Some(OfficeResponse(value, ""))
-    case None => None
-  }
-
-
 
 
 }

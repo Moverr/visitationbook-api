@@ -7,11 +7,11 @@ import play.api.libs.json.{JsPath, Writes}
 
 
 object GuestResponseWrites {
-  implicit val guestWrites:Writes[GuestResponse]=(
+  implicit val guestWrites:Writes[ProfileResponse]=(
     (JsPath \ "id").write[Long] and
       (JsPath \ "first_name").write[String] and
       (JsPath \ "last_name").write[String]
-    )(unlift(GuestResponse.unapply))
+    )(unlift(ProfileResponse.unapply))
 
 
 }

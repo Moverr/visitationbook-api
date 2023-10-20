@@ -13,7 +13,7 @@ object RequestVisitResponseWrites {
   implicit val requestVisitResponseWrites:Writes[RequestVisitResponse]=(
     (JsPath \ "id").write[Long] and
       (JsPath \ "host").write[Option[HostReponse]] and
-      (JsPath \ "guest").write[Option[GuestResponse]] and
+      (JsPath \ "guest").write[Option[ProfileResponse]] and
       (JsPath \ "office").write[Option[OfficeResponse]] and
       (JsPath \ "start_date").write[Option[String]] and
       (JsPath \ "end_date").write[Option[String]] and
