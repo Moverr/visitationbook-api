@@ -27,7 +27,6 @@ class ProfileTable(tag: Tag) extends Table[ProfileEntity](tag, "profile") {
     , othernames
     , gender
     , profileType
-
     , createdAt
     , updatedAt
     , createdBy, updatedBy
