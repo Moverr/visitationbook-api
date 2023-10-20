@@ -7,7 +7,10 @@ import slick.sql.SqlProfile.ColumnOption.SqlType
 import java.sql.Timestamp
 
 
-case class ProfileEntity(id: Long, user_id: Option[Long], firstname: Option[String]
+case class ProfileEntity(
+                          id: Long
+                         , user_id: Option[Long]
+                         , firstname: Option[String]
                          , othernames: Option[String]
                          , gender: Option[String]
                          , profile_type: Option[String]
