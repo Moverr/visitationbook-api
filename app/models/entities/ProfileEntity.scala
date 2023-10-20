@@ -9,18 +9,27 @@ import java.sql.Timestamp
 
 case class ProfileEntity(id: Long, user_id: Option[Long], firstname: Option[String]
                          , othernames: Option[String]
-                         , gender: Option[String], profile_type: Option[Long]
-                         , created_at: Option[Timestamp], updated_at: Option[Timestamp]
-                         , created_by: Option[Long], updated_by: Option[Long]
+                         , gender: Option[String]
+                         , profile_type: Option[String]
+                         , created_at: Timestamp
+                         , updated_at: Option[Timestamp]
+                         , created_by: Option[Long]
+                         , updated_by: Option[Long]
                         )
 
 
 class ProfileTable(tag: Tag) extends Table[ProfileEntity](tag, "profile") {
 
-  override def * : ProvenShape[ProfileEntity] = (id, userId, firstName
+  override def * : ProvenShape[ProfileEntity] = (
+    id
+    , userId
+    , firstName
     , othernames
-    , gender, profileType
-    , createdAt, updatedAt
+    , gender
+    , profileType
+
+    , createdAt
+    , updatedAt
     , createdBy, updatedBy
   ).mapTo[ProfileEntity]
 
