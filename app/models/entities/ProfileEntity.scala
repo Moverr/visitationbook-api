@@ -32,7 +32,8 @@ class ProfileTable(tag: Tag) extends Table[ProfileEntity](tag, "profile") {
     , profileType
     , createdAt
     , updatedAt
-    , createdBy, updatedBy
+    , createdBy
+    , updatedBy
   ).mapTo[ProfileEntity]
 
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)

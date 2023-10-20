@@ -79,7 +79,7 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
 
   private def populateProfile(guestID: Option[ProfileEntity]): Option[ProfileResponse] =
     guestID match {
-      case Some(value) => Some(ProfileResponse(value.id, "", ""))
+      case Some(value) => Some(ProfileResponse(value.id, value.firstname.getOrElse("N/A"), value.othernames.getOrElse("N/A")))
       case None => None
     }
 
