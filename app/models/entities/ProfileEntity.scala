@@ -9,15 +9,16 @@ import java.sql.Timestamp
 
 case class ProfileEntity(
                           id: Long
-                         , user_id: Option[Long]
-                         , firstname: Option[String]
-                         , othernames: Option[String]
-                         , gender: Option[String]
-                         , profile_type: Option[String]
-                         , created_at: Timestamp
-                         , updated_at: Option[Timestamp]
-                         , created_by: Option[Long]
-                         , updated_by: Option[Long]
+                          , user_id: Option[Long]
+                          , firstname: Option[String]
+                          , othernames: Option[String]
+                          , gender: Option[String]
+                          , profile_type: Option[String]
+                          , created_at: Timestamp
+                          , updated_at: Option[Timestamp]
+                          , created_by: Option[Long]
+                          , updated_by: Option[Long]
+                          , status: Option[String]
                         )
 
 
@@ -34,6 +35,7 @@ class ProfileTable(tag: Tag) extends Table[ProfileEntity](tag, "profile") {
     , updatedAt
     , createdBy
     , updatedBy
+    , status
   ).mapTo[ProfileEntity]
 
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
@@ -55,4 +57,6 @@ class ProfileTable(tag: Tag) extends Table[ProfileEntity](tag, "profile") {
   def updatedAt = column[Option[Timestamp]]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
 
   def updatedBy = column[Option[Long]]("updated_by")
+
+  def status = column[Option[String]]("status")
 }
