@@ -17,6 +17,7 @@ object RequestVisitResponseWrites {
       (JsPath \ "start_date").write[Option[String]] and
       (JsPath \ "end_date").write[Option[String]] and
       (JsPath \ "status").write[String] and
+      (JsPath \ "inv_type").write[String] and
       (JsPath \ "timezone").write[Option[String]] and
       (JsPath \ "created_at").write[Option[Timestamp]] and
       (JsPath \ "updated_at").write[Option[Timestamp]]

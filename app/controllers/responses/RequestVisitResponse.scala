@@ -10,6 +10,7 @@ case class RequestVisitResponse(
                                  startDate: Option[String],
                                  endDate: Option[String],
                                  status: String,
+                                 invType: String, 
                                  timezone: Option[String],
                                  createdAt: Option[Timestamp],
                                  updatedAt: Option[Timestamp]
