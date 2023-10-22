@@ -20,6 +20,7 @@ class RequestVisitationDAO @Inject()(private val dbConfigProvider: DatabaseConfi
   import profile.api._
 
   def create(visitation: visitationRequestEntity): Future[visitationRequestEntity] = {
+
     val query = visitationRequets.returning(visitationRequets) += visitation
     db.run(query)
   }

@@ -4,12 +4,15 @@ import controllers.requests.VisitRequest
 import controllers.responses.{OfficeResponse, ProfileResponse, RequestVisitResponse}
 import models.daos.RequestVisitationDAO
 import models.entities.{ProfileEntity, visitationRequestEntity}
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, Duration}
+import org.postgresql.util.PSQLException
+import play.api.mvc.Result
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Ordered.orderingToOrdered
+import scala.util.{Failure, Success}
 
 @Singleton
 class RequestVisitationImpl @Inject()(
@@ -20,45 +23,31 @@ class RequestVisitationImpl @Inject()(
 
   def create(request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
-
-    //todo: find if host exits and guest exist ..
-
-    profileServiceImpl.getById(request.hostId)
-      .flatMap {
-        case Some(value) => ???
-
-
-        case None => return Left(new RuntimeException("Host Profile does not exist"))
-      }
-
-    profileServiceImpl.getById(request.guestId)
-      .flatMap {
-        case Some(value) => ???
-        case None => return Left(new RuntimeException("Guest Profile does not exist"))
-      }
-
-
-
     //DateTime.parse(request.timeOut)
     val timeInDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
     val timeOutDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
     //todo:validate that the user does not enter the same records twice.
 
-    if (timeInDate.isDefined && timeOutDate.isDefined) {
-      if (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime()) {
-        return Left(new RuntimeException("Time in Date is less than Time out Date"))
+
+      if ( (timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
+          Left(new RuntimeException("Time in Date is less than Time out Date"))
       }
-    }
+    else{
+
+
+          val visit: visitationRequestEntity = visitationRequestEntity(0L, Some(request.hostId), Some(request.guestId), request.officeId, request.departmentId, request.invitationType, new Timestamp(System.currentTimeMillis()), None, None, None, timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , Some("PENDING")
+          )
+          val response: Future[visitationRequestEntity] = requestVisitationDao.create(visit)
+          Right(response.map((record: visitationRequestEntity) => populate(record))(executionContext))
 
 
 
+      }
 
-    val visit: visitationRequestEntity = visitationRequestEntity(0L, Some(request.hostId), Some(request.guestId), request.officeId, request.departmentId, request.invitationType, new Timestamp(System.currentTimeMillis()), None, None, None, timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
-      , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
-      , Some("PENDING")
-    )
-    val response: Future[visitationRequestEntity] = requestVisitationDao.create(visit)
-    Right(response.map((record: visitationRequestEntity) => populate(record))(executionContext))
+
+
   }
 
   def list(offset: Long, limit: Long): Future[Seq[RequestVisitResponse]] = {
