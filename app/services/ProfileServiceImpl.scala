@@ -12,6 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionContext: ExecutionContext)  {
 
 
+
   def create(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
 
 
@@ -48,6 +49,16 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
   }
 
 
+  def archive(id: Long): Future[Either[Throwable, Boolean]] = {
+    val response: Future[Option[ProfileEntity]] = profileDAO.get(id)
+    response.map({
+      case Some(value: ProfileEntity) =>
+        profileDAO.archive(value.id)
+        Right(true)
+
+      case None => Left(new RuntimeException("Record does not exist"))
+    })
+  }
 
 
   def populate(entity: ProfileEntity): ProfileResponse = {
