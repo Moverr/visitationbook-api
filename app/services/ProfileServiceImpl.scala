@@ -14,10 +14,9 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
 
 
   def create(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
-
-
-    val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None,None,None,Some("PENDING"))
+    val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None,None,None,Some("ACTIVE"))
     val response: Future[ProfileEntity] = profileDAO.create(profile)
+      //.recoverWith( Left(   new RuntimeException("Record does not exist")))
     Right(response.map((record: ProfileEntity) => populate(record))(executionContext))
   }
 

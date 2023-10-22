@@ -25,6 +25,8 @@ class ProfileDAO @Inject()( private val dbConfigProvider:DatabaseConfigProvider)
     db.run(query)
   }
 
+
+
   //todo: list
   def list(offset: Long, limit: Long): Future[Seq[ProfileEntity]] =   db run profiles.drop(offset).take(limit).result
 
@@ -32,6 +34,8 @@ class ProfileDAO @Inject()( private val dbConfigProvider:DatabaseConfigProvider)
   def get(id: Long): Future[Option[ProfileEntity]] = {
     db.run(profiles.filter(_.id === id).result.headOption)
   }
+
+
 
   def update(id: Long, profile: ProfileEntity): Future[ProfileEntity] = {
     val query = profiles.filter(_.id === id).update(profile)
