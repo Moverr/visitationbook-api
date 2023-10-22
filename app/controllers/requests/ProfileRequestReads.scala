@@ -8,7 +8,7 @@ object ProfileRequestReads {
   implicit  val profileRequestReads:Reads[ProfileRequest]=(
     (JsPath \ "user_id").readNullable[Long] and
       (JsPath \ "first_name").readNullable[String] and
-      (JsPath \ "last_name").readNullable[String] and
+      (JsPath \ "other_names").readNullable[String] and
       (JsPath \ "gender").readNullable[String] and
       (JsPath \ "profile_type").readNullable[String]
   )(ProfileRequest.apply _)
