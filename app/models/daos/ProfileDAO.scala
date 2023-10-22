@@ -39,14 +39,14 @@ class ProfileDAO @Inject()( private val dbConfigProvider:DatabaseConfigProvider)
     Future.successful(profile)
   }
 
-  def delete(id: Long): Any = {
+  def delete(id: Long): Future[Int] = {
     val query = profiles.filter(_.id === id).delete
     db.run(query)
   }
 
 
   def archive(id: Long): Future[Int] = {
-    val query = profiles.filter(_.id === id).map(_.status).update("ARCHIVED")
+    val query = profiles.filter(_.id === id).map(_.status).update(Some("ARCHIVED"))
     db.run(query)
 
   }

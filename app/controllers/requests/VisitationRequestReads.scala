@@ -1,12 +1,9 @@
 package controllers.requests
 
 
-import models.VisitationStatus.VisitationStatus
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsPath, Reads}
-
-import  VisitationStatusReads.readVisitationStatus
 
 object VisitationRequestReads {
 

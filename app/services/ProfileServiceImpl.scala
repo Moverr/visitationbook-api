@@ -2,17 +2,16 @@ package services
 
 import controllers.requests.VisitRequest
 import controllers.responses.{OfficeResponse, ProfileResponse, RequestVisitResponse}
-import models.daos.RequestVisitationDAO
+import models.daos.ProfileDAO
 import models.entities.{ProfileEntity, visitationRequestEntity}
 import org.joda.time.DateTime
 
 import java.sql.Timestamp
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.math.Ordered.orderingToOrdered
 
-@Singleton
-class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext) {
+class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionContext: ExecutionContext)  {
+
 
   def create(request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
     //DateTime.parse(request.timeOut)
@@ -44,6 +43,7 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
     }
 
   }
+
   def populate(entity: visitationRequestEntity): RequestVisitResponse = {
     RequestVisitResponse(
       entity.id,
@@ -53,14 +53,13 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
       entity.startDate.map((x: Timestamp) => x.toString)
       , entity.endDate.map((x: Timestamp) => x.toString)
       , "STATUS"
-      ,entity.invType.getOrElse(" - ")
+      , entity.invType.getOrElse(" - ")
       , None
       , Some(entity.createdAt)
       , entity.updatedAt
     )
 
   }
-
 
 
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
