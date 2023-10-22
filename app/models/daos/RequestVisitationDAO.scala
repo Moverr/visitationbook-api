@@ -35,7 +35,7 @@ class RequestVisitationDAO @Inject()(private val dbConfigProvider: DatabaseConfi
 
     } yield (a, b, c)
 
-    db run (basic.drop(offset).take(limit).result)
+    db run basic.drop(offset).take(limit).result
   }
 
   //todo: get by id

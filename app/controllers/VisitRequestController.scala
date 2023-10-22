@@ -62,7 +62,7 @@ class VisitRequestController @Inject()(
 
 
   def delete(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    val res = service.delete(id);
+    val res = service.delete(id)
     res.flatMap {
       case Left(exception) =>
         exception match {
