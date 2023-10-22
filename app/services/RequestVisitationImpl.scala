@@ -26,6 +26,8 @@ class RequestVisitationImpl @Inject()(
     profileServiceImpl.getById(request.hostId)
       .flatMap {
         case Some(value) => ???
+
+
         case None => return Left(new RuntimeException("Host Profile does not exist"))
       }
 
