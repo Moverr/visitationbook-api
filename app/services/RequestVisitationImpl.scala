@@ -4,15 +4,12 @@ import controllers.requests.VisitRequest
 import controllers.responses.{OfficeResponse, ProfileResponse, RequestVisitResponse}
 import models.daos.RequestVisitationDAO
 import models.entities.{ProfileEntity, visitationRequestEntity}
-import org.joda.time.{DateTime, Duration}
-import org.postgresql.util.PSQLException
-import play.api.mvc.Result
+import org.joda.time.DateTime
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Ordered.orderingToOrdered
-import scala.util.{Failure, Success}
 
 @Singleton
 class RequestVisitationImpl @Inject()(
@@ -42,11 +39,7 @@ class RequestVisitationImpl @Inject()(
           val response: Future[visitationRequestEntity] = requestVisitationDao.create(visit)
           Right(response.map((record: visitationRequestEntity) => populate(record))(executionContext))
 
-
-
       }
-
-
 
   }
 
@@ -58,6 +51,39 @@ class RequestVisitationImpl @Inject()(
     }
 
   }
+
+
+
+  private def populateProfile(guestID: Option[ProfileEntity]): Option[ProfileResponse] =
+    guestID match {
+      case Some(value) => Some(ProfileResponse(value.id, value.firstname.getOrElse("N/A"), value.othernames.getOrElse("N/A")))
+      case None => None
+    }
+
+  private def populateOfficeResponse(officeID: Option[Long]): Option[OfficeResponse] = officeID match {
+    case Some(value) => Some(OfficeResponse(value, ""))
+    case None => None
+  }
+
+  def getById(id: Long): Future[Option[RequestVisitResponse]] = {
+    val response: Future[Option[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.get(id)
+    response.map((value) => value.map((optionValue) => populate(optionValue)))
+  }
+
+
+
+  def delete(id: Long): Future[Either[Throwable, Boolean]] = {
+    val response = requestVisitationDao.get(id)
+    response.map({
+      case Some(value) =>
+        requestVisitationDao.delete(value._1.id)
+        Right(true)
+
+      case None => Left(new RuntimeException("Record does not exist"))
+    })
+
+  }
+
 
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
     RequestVisitResponse(
@@ -76,21 +102,6 @@ class RequestVisitationImpl @Inject()(
 
   }
 
-  private def populateProfile(guestID: Option[ProfileEntity]): Option[ProfileResponse] =
-    guestID match {
-      case Some(value) => Some(ProfileResponse(value.id, value.firstname.getOrElse("N/A"), value.othernames.getOrElse("N/A")))
-      case None => None
-    }
-
-  private def populateOfficeResponse(officeID: Option[Long]): Option[OfficeResponse] = officeID match {
-    case Some(value) => Some(OfficeResponse(value, ""))
-    case None => None
-  }
-
-  def getById(id: Long): Future[Option[RequestVisitResponse]] = {
-    val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
-    response.map((value: _root_.scala.Option[_root_.models.entities.visitationRequestEntity]) => value.map((optionValue: visitationRequestEntity) => populate(optionValue)))
-  }
 
   def populate(entity: visitationRequestEntity): RequestVisitResponse = {
     RequestVisitResponse(
@@ -100,7 +111,7 @@ class RequestVisitationImpl @Inject()(
       populateOfficeResponse(entity.officeId),
       entity.startDate.map((x: Timestamp) => x.toString)
       , entity.endDate.map((x: Timestamp) => x.toString)
-      , "STATUS"
+      , entity.status.getOrElse("-")
       , entity.invType.getOrElse(" - ")
       , None
       , Some(entity.createdAt)
@@ -108,18 +119,5 @@ class RequestVisitationImpl @Inject()(
     )
 
   }
-
-  def delete(id: Long): Future[Either[Throwable, Boolean]] = {
-    val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
-    response.map({
-      case Some(value: visitationRequestEntity) =>
-        requestVisitationDao.delete(value.id)
-        Right(true)
-
-      case None => Left(new RuntimeException("Record does not exist"))
-    })
-
-  }
-
 
 }

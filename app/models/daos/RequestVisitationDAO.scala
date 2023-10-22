@@ -39,16 +39,25 @@ class RequestVisitationDAO @Inject()(private val dbConfigProvider: DatabaseConfi
   }
 
   //todo: get by id
-  def get(id: Long): Future[Option[visitationRequestEntity]] = {
-    db.run(visitationRequets.filter(_.id === id).result.headOption)
+  def get(id: Long): Future[Option[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = {
+
+    val basic = for {
+      ((a, b), c) <- visitationRequets
+        .joinLeft(profiles).on(_.hostId === _.id)
+        .joinLeft(profiles).on(_._1.guestId === _.id)
+
+    } yield (a, b, c)
+
+    db.run(basic.filter(_._1.id ===id).result.headOption)
+
   }
 
   //todo: update
-  def update(id: Long, visitation: visitationRequestEntity): Future[visitationRequestEntity] = {
+  def update(id: Long, visitation: visitationRequestEntity): Future[Boolean] = {
 
     val query = visitationRequets.filter(_.id === id).update(visitation)
     db.run(query)
-    Future.successful(visitation)
+    Future.successful(true)
   }
 
   def delete(id: Long): Any = {
