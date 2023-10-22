@@ -5,19 +5,19 @@ import play.api.libs.json.{JsPath, Writes}
 
 import java.sql.Timestamp
 
-import HostResponseWrites._
-import  GuestResponseWrites._
+import ProfileResponseWrites._
 import  OfficeResponseWrites._
 
 object RequestVisitResponseWrites {
   implicit val requestVisitResponseWrites:Writes[RequestVisitResponse]=(
     (JsPath \ "id").write[Long] and
-      (JsPath \ "host").write[Option[HostReponse]] and
-      (JsPath \ "guest").write[Option[GuestResponse]] and
+      (JsPath \ "host").write[Option[ProfileResponse]] and
+      (JsPath \ "guest").write[Option[ProfileResponse]] and
       (JsPath \ "office").write[Option[OfficeResponse]] and
       (JsPath \ "start_date").write[Option[String]] and
       (JsPath \ "end_date").write[Option[String]] and
       (JsPath \ "status").write[String] and
+      (JsPath \ "inv_type").write[String] and
       (JsPath \ "timezone").write[Option[String]] and
       (JsPath \ "created_at").write[Option[Timestamp]] and
       (JsPath \ "updated_at").write[Option[Timestamp]]

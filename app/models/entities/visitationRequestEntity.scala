@@ -2,35 +2,34 @@ package models.entities
 
 
 import slick.jdbc.PostgresProfile.api._
+import slick.lifted.TableQuery
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
 import java.sql.Timestamp
-import slick.jdbc.PostgresProfile.api._
-import slick.jdbc.JdbcProfile
-import slick.lifted.TableQuery
 
 
-case class visitationRequestEntity(id: Long
+case class visitationRequestEntity(
+                                    id: Long
                                    , hostId: Option[Long]
                                    , guestId: Option[Long]
                                    , officeId: Option[Long]
-                                   , departmentId: Option[Long],
-                                   invType: Option[String],
-                                   createdAt: Timestamp,
-                                   createdBy: Option[Long],
-                                   updatedAt: Option[Timestamp]
+                                   , departmentId: Option[Long]
+                                   , invType: Option[String]
+                                   , createdAt: Timestamp
+                                   , createdBy: Option[Long]
+                                   , updatedAt: Option[Timestamp]
                                    , updatedBy: Option[Long]
                                    , startDate: Option[Timestamp]
                                    , endDate: Option[Timestamp]
+                                    , status: Option[String]
                                   )
 
 class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](tag, "visitationrequests") {
   val profile = TableQuery[ProfileTable]
+
+  override def * = (id, hostId, guestId, officeId, departmentId, invType, dateCreated, createdBy, dateUpdated, updatedBy, startDate, endDate,status).mapTo[visitationRequestEntity]
+
   def id = column[Long]("id", O.AutoInc, O.PrimaryKey)
-
-  def hostId = column[Option[Long]]("host_id")
-
-  def guestId = column[Option[Long]]("guest_id")
 
   def officeId = column[Option[Long]]("office_id")
 
@@ -51,12 +50,17 @@ class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](ta
 
   def endDate = column[Option[Timestamp]]("end_date")
 
-  override def * = (id, hostId, guestId, officeId, departmentId, invType, dateCreated, createdBy, dateUpdated, updatedBy, startDate, endDate).mapTo[visitationRequestEntity]
-
-
   //todo: host and guest extensiong
-   def host = foreignKey("FK_Host", hostId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+  def host = foreignKey("FK_Host", hostId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+
+  def hostId = column[Option[Long]]("host_id")
+
   def guest = foreignKey("FK_Host", guestId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+
+  def guestId = column[Option[Long]]("guest_id")
+
+  def status = column[Option[String]]("status",O.Default(Some("PENDING")))
+
 
 
 }

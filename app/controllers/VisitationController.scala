@@ -50,12 +50,6 @@ class VisitationController @Inject()(
     val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
     response.flatMap(value => Future.successful(
       Ok(Json.toJson(value))
-        .withHeaders(
-          "Access-Control-Allow-Origin" -> "http://localhost:3000",
-          "Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE",
-          "Access-Control-Allow-Headers" -> "Content-Type, Authorization"
-        )
-
     ))
   }
 
