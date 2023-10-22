@@ -12,9 +12,31 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.math.Ordered.orderingToOrdered
 
 @Singleton
-class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO)(implicit executionContext: ExecutionContext) {
+class RequestVisitationImpl @Inject()(
+                                       val requestVisitationDao: RequestVisitationDAO
+                                       , val profileServiceImpl: ProfileServiceImpl
+                                       , implicit val executionContext: ExecutionContext
+                                     ) {
 
   def create(request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
+
+
+    //todo: find if host exits and guest exist ..
+
+    profileServiceImpl.getById(request.hostId)
+      .flatMap {
+        case Some(value) => ???
+        case None => return Left(new RuntimeException("Host Profile does not exist"))
+      }
+
+    profileServiceImpl.getById(request.guestId)
+      .flatMap {
+        case Some(value) => ???
+        case None => return Left(new RuntimeException("Guest Profile does not exist"))
+      }
+
+
+
     //DateTime.parse(request.timeOut)
     val timeInDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
     val timeOutDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
@@ -26,9 +48,10 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
       }
     }
 
-    //todo: find if host exits and guest exist ..
 
-    val visit: visitationRequestEntity = visitationRequestEntity(0L, request.hostId, request.guestId, request.officeId, request.departmentId, request.invitationType, new Timestamp(System.currentTimeMillis()), None, None, None, timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
+
+
+    val visit: visitationRequestEntity = visitationRequestEntity(0L, Some(request.hostId), Some(request.guestId), request.officeId, request.departmentId, request.invitationType, new Timestamp(System.currentTimeMillis()), None, None, None, timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
       , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
       , Some("PENDING")
     )
@@ -44,24 +67,6 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
     }
 
   }
-  def populate(entity: visitationRequestEntity): RequestVisitResponse = {
-    RequestVisitResponse(
-      entity.id,
-      populateProfile(None),
-      populateProfile(None),
-      populateOfficeResponse(entity.officeId),
-      entity.startDate.map((x: Timestamp) => x.toString)
-      , entity.endDate.map((x: Timestamp) => x.toString)
-      , "STATUS"
-      ,entity.invType.getOrElse(" - ")
-      , None
-      , Some(entity.createdAt)
-      , entity.updatedAt
-    )
-
-  }
-
-
 
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
     RequestVisitResponse(
@@ -94,6 +99,23 @@ class RequestVisitationImpl @Inject()(requestVisitationDao: RequestVisitationDAO
   def getById(id: Long): Future[Option[RequestVisitResponse]] = {
     val response: Future[Option[visitationRequestEntity]] = requestVisitationDao.get(id)
     response.map((value: _root_.scala.Option[_root_.models.entities.visitationRequestEntity]) => value.map((optionValue: visitationRequestEntity) => populate(optionValue)))
+  }
+
+  def populate(entity: visitationRequestEntity): RequestVisitResponse = {
+    RequestVisitResponse(
+      entity.id,
+      populateProfile(None),
+      populateProfile(None),
+      populateOfficeResponse(entity.officeId),
+      entity.startDate.map((x: Timestamp) => x.toString)
+      , entity.endDate.map((x: Timestamp) => x.toString)
+      , "STATUS"
+      , entity.invType.getOrElse(" - ")
+      , None
+      , Some(entity.createdAt)
+      , entity.updatedAt
+    )
+
   }
 
   def delete(id: Long): Future[Either[Throwable, Boolean]] = {
