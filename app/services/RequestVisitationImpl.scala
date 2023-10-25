@@ -36,8 +36,8 @@ class RequestVisitationImpl @Inject()(
             , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
             , Some("PENDING")
           )
-          val response: Future[visitationRequestEntity] = requestVisitationDao.create(visit)
-          Right(response.map((record: visitationRequestEntity) => populate(record))(executionContext))
+          val response = requestVisitationDao.create(visit)
+          Right(response.map((record) => populate(record))(executionContext))
 
       }
 
