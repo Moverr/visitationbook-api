@@ -10,6 +10,6 @@ if not exist %SBT_PATH% (
 )
 
 cd ../
-call sbt dist
+call %SBT_PATH% dist
 
 echo end of execution
