@@ -9,7 +9,7 @@ if not exist %SBT_PATH% (
     exit /b
 )
 
-cd ../
+cd "%WORKSPACE%"
 call %SBT_PATH% dist
 
 echo end of execution
