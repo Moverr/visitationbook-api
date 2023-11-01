@@ -8,7 +8,7 @@ object ProfileResponseWrites {
   implicit  val profileResponseWrites:Writes[ProfileResponse]=(
     (JsPath \ "id").write[Long] and
       (JsPath \ "first_name").write[String] and
-      (JsPath \ "last_name").write[String]
+      (JsPath \ "other_names").write[String]
 
   )(unlift(ProfileResponse.unapply))
 }
