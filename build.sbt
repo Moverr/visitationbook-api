@@ -51,7 +51,7 @@ libraryDependencies ++= Seq(
  "org.typelevel" %%"cats-core"%"2.9.0",
   "org.aspectj" % "aspectjweaver" % "1.9.19",
   "org.aspectj" % "aspectjrt" % "1.9.19",
-
+  "com.typesafe.play" %% "play-ws" % "2.8.18",
 //  testing
   "org.scalactic" %% "scalactic" % "3.2.15",
    "org.scalatest" %% "scalatest" % "3.2.15" % "test",
