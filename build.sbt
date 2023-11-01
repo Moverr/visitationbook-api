@@ -1,6 +1,6 @@
 
 
-name := """visitation"""
+name := """visitation-book-api"""
 organization := "com.kodeinc"
 
 version := "1.0-SNAPSHOT"
