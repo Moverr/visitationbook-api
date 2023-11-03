@@ -2,7 +2,7 @@ package models.entities
 
 
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.TableQuery
+import slick.lifted.{ForeignKeyQuery, TableQuery}
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
 import java.sql.Timestamp
@@ -50,12 +50,11 @@ class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](ta
 
   def endDate = column[Option[Timestamp]]("end_date")
 
-  //todo: host and guest extensiong
-  def host = foreignKey("FK_Host", hostId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+  def host: ForeignKeyQuery[ProfileTable, ProfileEntity] = foreignKey("FK_Host", hostId, profile)(_.id.?, onDelete = ForeignKeyAction.NoAction)
 
   def hostId = column[Option[Long]]("host_id")
 
-  def guest = foreignKey("FK_Host", guestId, profile)(_.id, onDelete = ForeignKeyAction.NoAction)
+  def guest = foreignKey("FK_Host", guestId, profile)(_.id.?, onDelete = ForeignKeyAction.NoAction)
 
   def guestId = column[Option[Long]]("guest_id")
 
