@@ -35,7 +35,6 @@ class VisitationRequestTable(tag: Tag) extends Table[visitationRequestEntity](ta
 
   def departmentId = column[Option[Long]]("department_id")
 
-  //ivitation type
   def invType = column[Option[String]]("inv_type")
 
   def dateCreated = column[Timestamp]("date_created", SqlType("timestamp not null default CURRENT_TIMESTAMP "))
