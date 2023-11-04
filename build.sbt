@@ -1,7 +1,7 @@
 
 
 name := """visitation"""
-organization := "com.kodeinc"
+organization := "com.khoodi-labs"
 
 version := "1.0-SNAPSHOT"
 
