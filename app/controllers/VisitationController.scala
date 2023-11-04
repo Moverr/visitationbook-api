@@ -6,7 +6,7 @@ import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
 import controllers.responses.VisitationResponseWrites._
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import play.api.libs.json.Json
-import play.api.mvc.{BaseController, ControllerComponents, WrappedRequest}
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents, WrappedRequest}
 import services.VisitationServiceImpl
 
 import javax.inject.{Inject, Singleton}
@@ -20,7 +20,7 @@ class VisitationController @Inject()(
                                       val service: VisitationServiceImpl
                                     ) extends BaseController {
 
-  def create() = Action.async { implicit request =>
+  def create(): Action[AnyContent] = Action.async { implicit request =>
 
     try {
 
@@ -46,7 +46,7 @@ class VisitationController @Inject()(
     }
   }
 
-  def list(limit: Long, offset: Long) = Action.async { implicit request =>
+  def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
     val response: Future[Seq[VisitationResponse]] = service.list(limit, offset)
     response.flatMap(value => Future.successful(
       Ok(Json.toJson(value))
@@ -54,20 +54,16 @@ class VisitationController @Inject()(
   }
 
 
-  def getById(id: Long) = Action.async { implicit request =>
+  def getById(id: Long): Action[AnyContent] = Action.async { implicit request =>
     val response: Future[Option[VisitationResponse]] = service.getById(id)
-    response.flatMap(
-      value =>
-        value match {
-          case Some(value) => Future.successful(Ok(Json.toJson(value)))
-          case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Item does not exist"))))
-        }
-
-    )
+    response.flatMap {
+      case Some(value) => Future.successful(Ok(Json.toJson(value)))
+      case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Item does not exist"))))
+    }
   }
 
 
-  def delete(id: Long) = Action.async { implicit request =>
+  def delete(id: Long): Action[AnyContent] = Action.async { implicit request =>
     val res = service.delete(id);
     res.flatMap {
       case Left(exception) =>

@@ -1,8 +1,4 @@
 
-import cats.Show
-import cats.
+type binaryOperator= (Int,Int)=>Int
 
-
-0
- val p= 123.show
-3.
+val add:binaryOperator = (1,2)=>(1+3)

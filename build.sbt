@@ -1,7 +1,7 @@
 
 
-name := """visitation-book-api"""
-organization := "com.kodeinc"
+name := """visitation"""
+organization := "com.khoodi-labs"
 
 version := "1.0-SNAPSHOT"
 
@@ -34,17 +34,9 @@ libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick-hikaricp" % "3.3.2",
 
 
-  //Adding JWT TOkens
   "com.nimbusds" % "nimbus-jose-jwt" % "9.30.2",
 
-  // Adding akka actors
-  "com.typesafe.akka" %% "akka-actor" % "2.8.0",
-  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.0",
-  "com.typesafe.akka" %% "akka-slf4j" % "2.8.0",
-  "com.typesafe.akka" %% "akka-protobuf-v3" % "2.8.0",
-  "com.typesafe.akka" %% "akka-stream" % "2.8.0",
-  "com.typesafe.akka" %% "akka-serialization-jackson" % "2.8.0",
-  //akka-actor-typed, akka-slf4j, akka-protobuf-v3, akka-stream, akka-serialization-jackson]
+
 
   "commons-io"              % "commons-io"               % "20030203.000550",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
@@ -52,7 +44,6 @@ libraryDependencies ++= Seq(
   "org.aspectj" % "aspectjweaver" % "1.9.19",
   "org.aspectj" % "aspectjrt" % "1.9.19",
 
-//  testing
   "org.scalactic" %% "scalactic" % "3.2.15",
    "org.scalatest" %% "scalatest" % "3.2.15" % "test",
   "org.scalatestplus.play" %% "scalatestplus-play" % "5.1.0" % "test",
