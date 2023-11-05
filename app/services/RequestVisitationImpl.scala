@@ -54,11 +54,7 @@ class RequestVisitationImpl @Inject()(
 
 
 
-  private def populateProfile(guestID: Option[ProfileEntity]): Option[ProfileResponse] =
-    guestID match {
-      case Some(value) => Some(ProfileResponse(value.id, value.firstname.getOrElse("N/A"), value.othernames.getOrElse("N/A")))
-      case None => None
-    }
+
 
   private def populateOfficeResponse(officeID: Option[Long]): Option[OfficeResponse] = officeID match {
     case Some(value) => Some(OfficeResponse(value, ""))
@@ -88,8 +84,8 @@ class RequestVisitationImpl @Inject()(
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
     RequestVisitResponse(
       entity._1.id
-      , populateProfile(entity._2)
-      , populateProfile(entity._3)
+      , profileServiceImpl.populate(entity._2)
+      , profileServiceImpl.populate(entity._3)
       , populateOfficeResponse(None)
       , entity._1.startDate.map((x: Timestamp) => x.toString)
       , entity._1.endDate.map((x: Timestamp) => x.toString)
