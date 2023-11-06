@@ -6,4 +6,5 @@ case class ProfileRequest(
                            , otherNames: Option[String]
                            , gender: Option[String]
                            , profileType: Option[String]
+                         //todo: option  address
                          )

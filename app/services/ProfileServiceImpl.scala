@@ -11,12 +11,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionContext: ExecutionContext)  {
 
-
-
   def create(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
     val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None,None,None,Some("ACTIVE"))
     val response: Future[ProfileEntity] = profileDAO.create(profile)
-      //.recoverWith( Left(   new RuntimeException("Record does not exist")))
     Right(response.map((record: ProfileEntity) => populate(record))(executionContext))
   }
 
@@ -41,7 +38,6 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
       case Some(value: ProfileEntity) =>
         profileDAO.delete(value.id)
         Right(true)
-
       case None => Left(new RuntimeException("Record does not exist"))
     })
 
@@ -60,14 +56,18 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
   }
 
 
-  def populate(entity: ProfileEntity): ProfileResponse = {
+  def populate(entity: ProfileEntity): ProfileResponse =
     ProfileResponse(
       entity.id,
-      entity.firstname.getOrElse(""),
-      entity.othernames.getOrElse("")
+      entity.firstname.getOrElse("N/A"),
+      entity.othernames.getOrElse("N/A")
     )
 
-  }
 
 
+  def populate(entity: Option[ProfileEntity]): Option[ProfileResponse] =
+    entity match {
+      case Some(value) => Some(populate(value))
+      case None => None
+    }
 }

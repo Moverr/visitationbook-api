@@ -14,7 +14,8 @@ import scala.math.Ordered.orderingToOrdered
 @Singleton
 class RequestVisitationImpl @Inject()(
                                        val requestVisitationDao: RequestVisitationDAO
-                                       , val profileServiceImpl: ProfileServiceImpl
+                                       ,val profileServiceImpl: ProfileServiceImpl
+                                       ,val officeServiceImpl:OfficeServiceImpl
                                        , implicit val executionContext: ExecutionContext
                                      ) {
 
@@ -54,16 +55,6 @@ class RequestVisitationImpl @Inject()(
 
 
 
-  private def populateProfile(guestID: Option[ProfileEntity]): Option[ProfileResponse] =
-    guestID match {
-      case Some(value) => Some(ProfileResponse(value.id, value.firstname.getOrElse("N/A"), value.othernames.getOrElse("N/A")))
-      case None => None
-    }
-
-  private def populateOfficeResponse(officeID: Option[Long]): Option[OfficeResponse] = officeID match {
-    case Some(value) => Some(OfficeResponse(value, ""))
-    case None => None
-  }
 
   def getById(id: Long): Future[Option[RequestVisitResponse]] = {
     val response: Future[Option[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.get(id)
@@ -88,9 +79,9 @@ class RequestVisitationImpl @Inject()(
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
     RequestVisitResponse(
       entity._1.id
-      , populateProfile(entity._2)
-      , populateProfile(entity._3)
-      , populateOfficeResponse(None)
+      , profileServiceImpl.populate(entity._2)
+      , profileServiceImpl.populate(entity._3)
+      , officeServiceImpl.populate(None)
       , entity._1.startDate.map((x: Timestamp) => x.toString)
       , entity._1.endDate.map((x: Timestamp) => x.toString)
       , entity._1.status.getOrElse(" - ")
@@ -106,9 +97,9 @@ class RequestVisitationImpl @Inject()(
   def populate(entity: visitationRequestEntity): RequestVisitResponse = {
     RequestVisitResponse(
       entity.id,
-      populateProfile(None),
-      populateProfile(None),
-      populateOfficeResponse(entity.officeId),
+      profileServiceImpl.populate(None),
+      profileServiceImpl.populate(None),
+      officeServiceImpl.populate(entity.officeId),
       entity.startDate.map((x: Timestamp) => x.toString)
       , entity.endDate.map((x: Timestamp) => x.toString)
       , entity.status.getOrElse("-")
