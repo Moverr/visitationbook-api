@@ -43,8 +43,9 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
 
   }
 
-  def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
-    val response: Future[Seq[ProfileResponse]] = serviceImpl.list(limit, offset)
+  //todo: fetch all
+  def list(limit: Long, offset: Long,profileType:String): Action[AnyContent] = Action.async { implicit request =>
+    val response: Future[Seq[ProfileResponse]] = serviceImpl.list(limit, offset,profileType)
     response.flatMap(value => Future.successful(
       Ok(Json.toJson(value))
     ))
