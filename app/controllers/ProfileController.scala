@@ -1,5 +1,6 @@
 package controllers
 
+import cats.Functor
 import com.google.inject.Singleton
 import controllers.requests.ProfileRequest
 import controllers.responses.GuestResponseWrites.guestWrites
@@ -18,6 +19,11 @@ import scala.concurrent.Future
 class ProfileController @Inject()(val controllerComponents: ControllerComponents)(val serviceImpl: ProfileServiceImpl)
   extends BaseController {
 
+  val optionFunctor: Functor[Option] = Functor[Option]
+  val originalOption: Option[Int] = Some(42)
+
+  //todo: pass expected parameter
+  val squaredOption: Option[Int] = optionFunctor.map(originalOption)(x => x * x)
 
   import requests.ProfileRequestReads._
   import responses.ErrorRespnseWrites._
