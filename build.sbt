@@ -36,8 +36,6 @@ libraryDependencies ++= Seq(
 
   "com.nimbusds" % "nimbus-jose-jwt" % "9.30.2",
 
-
-
   "commons-io"              % "commons-io"               % "20030203.000550",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.2.0",
  "org.typelevel" %%"cats-core"%"2.9.0",

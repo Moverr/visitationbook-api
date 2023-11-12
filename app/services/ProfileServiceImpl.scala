@@ -17,8 +17,8 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
     Right(response.map((record: ProfileEntity) => populate(record))(executionContext))
   }
 
-  def list(limit: Long, offset: Long): Future[Seq[ProfileResponse]] = {
-    val response:  Future[Seq[ProfileEntity]]  = profileDAO.list(offset, limit)
+  def list(limit: Long, offset: Long,profileType:String): Future[Seq[ProfileResponse]] = {
+    val response:  Future[Seq[ProfileEntity]]  = profileDAO.list(offset, limit,profileType)
 
     response.map {
       record => record.map(item => populate(item))

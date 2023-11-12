@@ -1,5 +1,6 @@
 package controllers
 
+import cats.Functor
 import com.google.inject.Singleton
 import controllers.requests.ProfileRequest
 import controllers.responses.GuestResponseWrites.guestWrites
@@ -18,6 +19,11 @@ import scala.concurrent.Future
 class ProfileController @Inject()(val controllerComponents: ControllerComponents)(val serviceImpl: ProfileServiceImpl)
   extends BaseController {
 
+  val optionFunctor: Functor[Option] = Functor[Option]
+  val originalOption: Option[Int] = Some(42)
+
+  //todo: pass expected parameter
+  val squaredOption: Option[Int] = optionFunctor.map(originalOption)(x => x * x)
 
   import requests.ProfileRequestReads._
   import responses.ErrorRespnseWrites._
@@ -43,8 +49,9 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
 
   }
 
-  def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
-    val response: Future[Seq[ProfileResponse]] = serviceImpl.list(limit, offset)
+  //todo: fetch all
+  def list(limit: Long, offset: Long,profileType:String): Action[AnyContent] = Action.async { implicit request =>
+    val response: Future[Seq[ProfileResponse]] = serviceImpl.list(limit, offset,profileType)
     response.flatMap(value => Future.successful(
       Ok(Json.toJson(value))
     ))

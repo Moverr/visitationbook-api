@@ -32,10 +32,9 @@ class RequestVisitationDAO @Inject()(private val dbConfigProvider: DatabaseConfi
       ((a, b), c) <- visitationRequets
         .joinLeft(profiles).on(_.hostId === _.id)
         .joinLeft(profiles).on(_._1.guestId === _.id)
-
     } yield (a, b, c)
-
-    db run basic.drop(offset).take(limit).result
+    //sorting type: needs to be shifted to the front end
+    db run basic.sortBy(_._1.dateCreated.desc).drop(offset).take(limit).result
   }
 
   //todo: get by id
@@ -64,6 +63,7 @@ class RequestVisitationDAO @Inject()(private val dbConfigProvider: DatabaseConfi
     val query = visitationRequets.filter(_.id === id).delete
     db.run(query)
   }
+
 
 
   def archive(id: Long): Any = {
