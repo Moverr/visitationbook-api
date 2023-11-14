@@ -15,7 +15,7 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
   def validate(request: ProfileRequest):   Future[Option[ProfileResponse]] = {
     val response: Future[Option[ProfileEntity]] = profileDAO.findProfile(request.firstName.getOrElse(""),request.otherNames.getOrElse(""),request.profileType.getOrElse(""))
      val _response = response.flatMap {
-       case Some(_) => Future.successful(Some(populate))
+       case Some(value) => Future.successful(Some(populate(value)))
        case None => Future.successful(None)
      }
     _response
