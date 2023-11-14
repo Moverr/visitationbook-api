@@ -11,6 +11,17 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionContext: ExecutionContext)  {
 
+  def validate(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
+    val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None, None, None, Some("ACTIVE"))
+
+    //todo:find entity with the names if exists return a list
+
+    //todo: else create
+
+    val response: Future[ProfileEntity] = profileDAO.create(profile)
+    Right(response.map((record: ProfileEntity) => populate(record))(executionContext))
+  }
+
   def create(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
     val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None,None,None,Some("ACTIVE"))
     val response: Future[ProfileEntity] = profileDAO.create(profile)
