@@ -11,30 +11,37 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionContext: ExecutionContext)  {
 
-  def validate(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
-    val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None, None, None, Some("ACTIVE"))
 
-    //todo:find entity with the names if exists return a list
-
-    //todo: else create
-
-    val response: Future[ProfileEntity] = profileDAO.create(profile)
-    Right(response.map((record: ProfileEntity) => populate(record))(executionContext))
+  def validate(request: ProfileRequest):   Future[Option[ProfileResponse]] = {
+    val response: Future[Option[ProfileEntity]] = profileDAO.findProfile(request.firstName.getOrElse(""),request.otherNames.getOrElse(""),request.profileType.getOrElse(""))
+     val _response = response.flatMap {
+       case Some(value) => Future.successful(Some(populate(value)))
+       case None => Future.successful(None)
+     }
+    _response
   }
 
   def create(request: ProfileRequest): Either[Throwable, Future[ProfileResponse]] = {
-    val profile: ProfileEntity = ProfileEntity(0L, request.userId, request.firstName, request.otherNames, request.gender, request.profileType, new Timestamp(System.currentTimeMillis()), None,None,None,Some("ACTIVE"))
-    val response: Future[ProfileEntity] = profileDAO.create(profile)
-    Right(response.map((record: ProfileEntity) => populate(record))(executionContext))
+
+    val response: Future[Option[ProfileResponse]] = validate(request)
+    val resultFuture: Future[ProfileResponse] =  response.flatMap {
+      case Some(value) => Future.successful(value)
+      case None =>
+        val profile: ProfileEntity = ProfileEntity(
+          0L, request.userId, request.firstName, request.otherNames, request.gender,
+          request.profileType, new Timestamp(System.currentTimeMillis()), None, None, None, Some("ACTIVE")
+        )
+        profileDAO.create(profile).map(populate)
+    }
+    Right(resultFuture)
+
   }
 
   def list(limit: Long, offset: Long,profileType:String): Future[Seq[ProfileResponse]] = {
     val response:  Future[Seq[ProfileEntity]]  = profileDAO.list(offset, limit,profileType)
-
     response.map {
       record => record.map(item => populate(item))
     }
-
   }
 
 
