@@ -15,7 +15,7 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
   def validate(request: ProfileRequest):   Future[Option[ProfileResponse]] = {
     val response: Future[Option[ProfileEntity]] = profileDAO.findProfile(request.firstName.getOrElse(""),request.otherNames.getOrElse(""),request.profileType.getOrElse(""))
      val _response = response.flatMap {
-       case Some(value) => Future.successful(Some(populate(value)))
+       case Some(_) => Future.successful(Some(populate))
        case None => Future.successful(None)
      }
     _response
@@ -40,14 +40,14 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
   def list(limit: Long, offset: Long,profileType:String): Future[Seq[ProfileResponse]] = {
     val response:  Future[Seq[ProfileEntity]]  = profileDAO.list(offset, limit,profileType)
     response.map {
-      record => record.map(item => populate(item))
+      record => record.map(populate)
     }
   }
 
 
   def getById(id: Long): Future[Option[ProfileResponse]] = {
     val response: Future[Option[ProfileEntity]] = profileDAO.get(id)
-    response.map((value: _root_.scala.Option[_root_.models.entities.ProfileEntity]) => value.map((optionValue: ProfileEntity) => populate(optionValue)))
+    response.map((value: _root_.scala.Option[_root_.models.entities.ProfileEntity]) => value.map(populate))
   }
 
   def delete(id: Long): Future[Either[Throwable, Boolean]] = {
