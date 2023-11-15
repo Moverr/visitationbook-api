@@ -19,18 +19,14 @@ import scala.concurrent.Future
 class ProfileController @Inject()(val controllerComponents: ControllerComponents)(val serviceImpl: ProfileServiceImpl)
   extends BaseController {
 
-  val optionFunctor: Functor[Option] = Functor[Option]
-  val originalOption: Option[Int] = Some(42)
-
-  //todo: pass expected parameter
-  val squaredOption: Option[Int] = optionFunctor.map(originalOption)(x => x * x)
 
   import requests.ProfileRequestReads._
   import responses.ErrorRespnseWrites._
 
 
-
   def create: Action[AnyContent] = Action.async { implicit request =>
+
+    println("Blessed day")
     val json = request.body.asJson.get
     val profileRequest: ProfileRequest = json.as[ProfileRequest]
 
@@ -95,6 +91,19 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
 
   }
 
+
+  def validate: Action[AnyContent] = Action.async { implicit request =>
+    val json = request.body.asJson.get
+    val profileRequest: ProfileRequest = json.as[ProfileRequest]
+
+    val result: Future[Option[ProfileResponse]] = serviceImpl.validate(profileRequest)
+
+    result.flatMap {
+      case Some(response) => Future.successful(Ok(Json.toJson(response)))
+      case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Profile does not exist"))))
+    }
+
+  }
 
 
 }

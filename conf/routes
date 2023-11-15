@@ -22,7 +22,7 @@ POST /v1/profile                       controllers.ProfileController.create()
 GET /v1/profile/list                   controllers.ProfileController.list(limit:Long,offset:Long,profileType:String)
 GET /v1/profile/:id                    controllers.ProfileController.getById(id:Long)
 DELETE /v1/profile/:id                 controllers.ProfileController.archive(id:Long)
-
+POST /v1/profile/validate              controllers.ProfileController.validate()
 
 
 # Map static resources from the /public folder to the /assets URL path

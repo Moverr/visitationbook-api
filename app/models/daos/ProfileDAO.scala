@@ -19,6 +19,11 @@ class ProfileDAO @Inject()( private val dbConfigProvider:DatabaseConfigProvider)
   import dbConfig._
   import profile.api._
 
+
+  def findProfile(firstName:String,othernames:String,profileType:String):Future[Option[ProfileEntity]]={
+  val query = profiles.filter(profiles => profiles.firstName.asColumnOf[String].like(firstName)  && profiles.othernames.asColumnOf[String].like(othernames)   && profiles.profileType.asColumnOf[String].like(profileType)   )
+    db.run(query.result.headOption)
+}
   //todo: create
   def create(profile: ProfileEntity): Future[ProfileEntity] = {
     val query = profiles.returning(profiles) += profile
