@@ -33,5 +33,8 @@ case class VisitationEntity(id:Long, hostId:Option[Long], guestId:Option[Long], 
 
     def updated_at: Rep[Option[Timestamp]] = column[Option[Timestamp]]("updated_at", SqlType("timestamp not null default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP"))
 
-      override def * :ProvenShape[VisitationEntity] = (id, hostId, guestId,officeId,departmentId, timeIn, timeOut, status, timezone, created_at, updated_at) .mapTo[VisitationEntity]
+    def createdBy = column[Option[Long]]("created_by")
+
+    def updatedBy = column[Option[Long]]("updated_by")
+    override def * :ProvenShape[VisitationEntity] = (id, hostId, guestId,officeId,departmentId, timeIn, timeOut, status, timezone, created_at, updated_at) .mapTo[VisitationEntity]
      }
