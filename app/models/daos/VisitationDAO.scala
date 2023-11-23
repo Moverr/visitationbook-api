@@ -30,10 +30,7 @@ class VisitationDAO  @Inject()
   }
 
   //todo: lists
-  override def list(offset: Long, limit: Long): Future[Seq[VisitationEntity]] = {
-//    val query = for{
-//      (visitation,host,guest)<-
-//    }
+  override def list( limit: Long,offset: Long): Future[Seq[VisitationEntity]] = {
     db.run(visitationTable.sortBy(_.created_at).drop(offset).take(limit).result)
   }
 
@@ -44,7 +41,6 @@ class VisitationDAO  @Inject()
 
   //todo: update
   override def update(id: Long, visitation: VisitationEntity): Future[VisitationEntity] = {
-
     val query = visitationTable.filter(_.id === id).update(visitation)
     db.run(query)
     Future.successful(visitation)

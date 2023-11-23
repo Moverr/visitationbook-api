@@ -1,6 +1,6 @@
 package services
 
-import controllers.requests.VistationRequest
+import controllers.requests.VisitationRequest
 import controllers.responses._
 import models.daos.VisitationDAO
 import models.entities.VisitationEntity
@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) {
 
-   def create(request: VistationRequest):  Either[Throwable,Future[VisitationResponse]] = {
+   def create(request: VisitationRequest):  Either[Throwable,Future[VisitationResponse]] = {
     val timeOutDate:DateTime =   DateTime.parse(request.timeOut)
     val timeInDate:DateTime =  DateTime.parse(request.timeIn)
     val  currentDate = DateTime.now(DateTimeZone.forID(request.timezone.getOrElse("UTC")))
@@ -26,12 +26,12 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
       return Left(new RuntimeException("Time In should be less than Time Out "))
     }
 
-    val visit: VisitationEntity =   VisitationEntity(0L,request.hostId, request.guestId, request.officeId, request.departmentId, Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status, request.timezone, Some(new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis)), Some(new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis)))
+    val visit: VisitationEntity =   VisitationEntity(0L,request.hostId, request.guestId, request.officeId, request.departmentId, Some(new Timestamp(timeInDate.getMillis)), Some(new Timestamp(timeOutDate.getMillis)), request.status.getOrElse("PENDING"), request.timezone, Some(new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis)), Some(new Timestamp(DateTime.now(DateTimeZone.UTC).getMillis)))
     val response: Future[VisitationEntity] = visitationDao.create(visit)
     Right(response.map(record => populate(record)))
   }
 
-   def list(offset: Long, limit: Long): Future[Seq[VisitationResponse]] =   visitationDao.list(offset, limit)
+   def list(limit: Long,offset: Long): Future[Seq[VisitationResponse]] =   visitationDao.list(limit, offset)
        .map(futureResponse => futureResponse.map(record => populate(record)))
 
 
