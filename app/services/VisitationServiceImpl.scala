@@ -3,7 +3,7 @@ package services
 import controllers.requests.VisitationRequest
 import controllers.responses._
 import models.daos.VisitationDAO
-import models.entities.VisitationEntity
+import models.entities.{ProfileEntity, VisitationEntity, visitationRequestEntity}
 import org.joda.time.{DateTime, DateTimeZone}
 
 import java.sql.Timestamp
@@ -11,7 +11,11 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit executionContext: ExecutionContext) {
+class VisitationServiceImpl @Inject()(
+                                       val visitationDao: VisitationDAO
+                                      ,val profileServiceImpl: ProfileServiceImpl
+                                       ,val officeServiceImpl:OfficeServiceImpl
+                                     )(implicit executionContext: ExecutionContext) {
 
    def create(request: VisitationRequest):  Either[Throwable,Future[VisitationResponse]] = {
     val timeOutDate:DateTime =   DateTime.parse(request.timeOut)
@@ -31,8 +35,10 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
     Right(response.map(record => populate(record)))
   }
 
-   def list(limit: Long,offset: Long): Future[Seq[VisitationResponse]] =   visitationDao.list(limit, offset)
-       .map(futureResponse => futureResponse.map(record => populate(record)))
+   def list(limit: Long,offset: Long): Future[Seq[VisitationResponse]] =
+     visitationDao.list(limit, offset)
+        .map(futureResponse => futureResponse.map(record => populate(record)))
+
 
 
    def getById(id: Long): Future[Option[VisitationResponse]] = {
@@ -56,16 +62,35 @@ class VisitationServiceImpl @Inject()(visitationDao: VisitationDAO)(implicit exe
    def populate(entity: VisitationEntity): VisitationResponse =
     VisitationResponse(
       entity.id
-      , entity.hostId
-      , entity.guestId
+      , None
+      , None
+      ,None
       , entity.timeIn.map(x => x.toString)
       , entity.timeOut.map(x => x.toString)
       , entity.status
+      , "-"
       , entity.timezone
       , entity.created_at
       , entity.updated_at
     )
 
+
+  def populate(entity: (VisitationEntity, Option[ProfileEntity], Option[ProfileEntity])): VisitationResponse = {
+    VisitationResponse(
+      entity._1.id
+      , profileServiceImpl.populate(entity._2)
+      , profileServiceImpl.populate(entity._3)
+      , officeServiceImpl.populate(None)
+      , entity._1.timeIn.map((x: Timestamp) => x.toString)
+      , entity._1.timeOut.map((x: Timestamp) => x.toString)
+      , entity._1.status
+      , "- "
+      , None
+      , entity._1.created_at
+      , entity._1.updated_at
+    )
+
+  }
 
 
 }
