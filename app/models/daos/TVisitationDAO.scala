@@ -1,6 +1,6 @@
 package models.daos
 
-import models.entities.{VisitationEntity, VisitationTable}
+import models.entities.{ProfileEntity, VisitationEntity, VisitationTable}
 import slick.lifted.TableQuery
 
 import scala.concurrent.Future
@@ -13,7 +13,7 @@ trait TVisitationDAO {
   def create(visitation: VisitationEntity): Future[VisitationEntity]
 
   //todo: list
-  def list(offset: Long, limit: Long): Future[Seq[VisitationEntity]]
+  def   list( limit: Long,offset: Long): Future[Seq[(VisitationEntity, Option[ProfileEntity], Option[ProfileEntity])]]
 
   //todo: get by id
   def get(id: Long): Future[Option[VisitationEntity]]

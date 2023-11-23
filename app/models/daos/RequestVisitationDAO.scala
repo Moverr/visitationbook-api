@@ -28,13 +28,13 @@ class RequestVisitationDAO @Inject()(private val dbConfigProvider: DatabaseConfi
   //todo: lists
   def list(offset: Long, limit: Long): Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = {
 
-    val basic = for {
+    val query = for {
       ((a, b), c) <- visitationRequets
         .joinLeft(profiles).on(_.hostId === _.id)
         .joinLeft(profiles).on(_._1.guestId === _.id)
     } yield (a, b, c)
     //sorting type: needs to be shifted to the front end
-    db run basic.sortBy(_._1.dateCreated.desc).drop(offset).take(limit).result
+    db run query.sortBy(_._1.dateCreated.desc).drop(offset).take(limit).result
   }
 
   //todo: get by id

@@ -1,7 +1,7 @@
 package models.daos
 
 
-import models.entities.{VisitationEntity, VisitationTable}
+import models.entities.{ProfileEntity, ProfileTable, VisitationEntity, VisitationTable, visitationRequestEntity}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import javax.inject.{Inject, Singleton}
@@ -16,10 +16,12 @@ import scala.concurrent.impl.Promise
 
 @Singleton
 class VisitationDAO  @Inject()
-(protected  val dbConfigProvider: DatabaseConfigProvider)(  implicit executionContext: ExecutionContext) extends TVisitationDAO {
+(protected  val dbConfigProvider: DatabaseConfigProvider)(  implicit val executionContext: ExecutionContext) extends TVisitationDAO {
 
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
-  override lazy val visitationTable = TableQuery[VisitationTable]
+  val visitationTable = TableQuery[VisitationTable]
+  val profiles = TableQuery[ProfileTable]
+
 
   import dbConfig._
 
@@ -30,11 +32,15 @@ class VisitationDAO  @Inject()
   }
 
   //todo: lists
-  override def list(offset: Long, limit: Long): Future[Seq[VisitationEntity]] = {
-//    val query = for{
-//      (visitation,host,guest)<-
-//    }
-    db.run(visitationTable.sortBy(_.created_at).drop(offset).take(limit).result)
+  override def list( limit: Long,offset: Long): Future[Seq[(VisitationEntity, Option[ProfileEntity], Option[ProfileEntity])]] = {
+
+    val query = for {
+      ((a, b), c) <- visitationTable
+        .joinLeft(profiles).on(_.hostId === _.id)
+        .joinLeft(profiles).on(_._1.guestId === _.id)
+    } yield (a, b, c)
+
+    db run query.sortBy(_._1.created_at.desc).drop(offset).take(limit).result
   }
 
   //todo: get by id
@@ -44,7 +50,6 @@ class VisitationDAO  @Inject()
 
   //todo: update
   override def update(id: Long, visitation: VisitationEntity): Future[VisitationEntity] = {
-
     val query = visitationTable.filter(_.id === id).update(visitation)
     db.run(query)
     Future.successful(visitation)
