@@ -1,7 +1,10 @@
 FROM openjdk:17
-ENV SBT_VERSION 1.3.13
-RUN curl -L -o sbt-$SBT_VERSION.zip https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.zip
-RUN unzip sbt-$SBT_VERSION.zip -d ops
+
 WORKDIR /app
-ADD . /app
-CMD /ops/sbt/bin/sbt run
+
+#//todo: this is the out folder for the file
+#COPY build/libs/auth-v1.0.0-alpha.jar app.jar
+
+EXPOSE 8083
+
+CMD ["java", "-jar", "/app/app.jar"]
