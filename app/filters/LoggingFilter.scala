@@ -1,21 +1,24 @@
 package filters
 
 import akka.stream.Materializer
-import play.api.mvc._
+import play.api.mvc.{Filter, RequestHeader, Result}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
+
 class LoggingFilter @Inject()(implicit val mat: Materializer) extends Filter {
-  override def apply(next: RequestHeader => Future[Result])(request: RequestHeader): Future[Result] = {
+  @Override def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
     val startTime = System.currentTimeMillis()
 
-    next(request).map { result =>
+    nextFilter(requestHeader).map { result =>
       val endTime = System.currentTimeMillis()
       val requestTime = endTime - startTime
 
-      println(s"Request ${request.method} ${request.uri} took ${requestTime}ms")
+      println("This filter is working gracefully  ")
+      println(s"${requestHeader.method} ${requestHeader.uri} took ${requestTime} ms and returned ${result.header.status}")
+
       result
     }
   }
