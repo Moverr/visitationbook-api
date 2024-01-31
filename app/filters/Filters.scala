@@ -8,6 +8,6 @@ import javax.inject.Inject
 
 class Filters @Inject()(csrfFilter: CSRFFilter,
                         authenticationFilter: AuthenticationFilter,
-                          logginfilter:LoggingFilter) extends HttpFilters {
-  def filters: Seq[EssentialFilter] = Seq(csrfFilter, authenticationFilter,logginfilter)
+                        logFilter:LoggingFilter) extends HttpFilters {
+  def filters: Seq[EssentialFilter] = Seq(csrfFilter, authenticationFilter,logFilter)
 }
