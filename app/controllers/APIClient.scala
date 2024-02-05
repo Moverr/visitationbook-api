@@ -7,12 +7,18 @@ import play.api.libs.ws._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
-class APIClient(ws: WSClient)(implicit ec: ExecutionContext) {
+class APIClient(ws: WSClient)(implicit ec: ExecutionContext) extends TAPIClient {
 
-  def postRequest(url: String, headers: Map[String, String], requestBody: JsObject): Future[WSResponse] = {
+  /*
+  * Post Request
+  * @Param URL
+  * @Param headers
+  * @Param requestBody
+   */
+
+  override def postRequest(url: String, headers: Map[String, String], requestBody: JsObject): Future[WSResponse] = {
 
     val request: WSRequest = Try(ws.url(url)).getOrElse(throw new IllegalArgumentException("Invalid URL"))
-
 
     val requestWithHeaders: WSRequest = headers.foldLeft(request) {
       case (req, (name, value)) => req.addHttpHeaders(name -> value)
@@ -22,7 +28,12 @@ class APIClient(ws: WSClient)(implicit ec: ExecutionContext) {
   }
 
 
-  def defRequest(url: String, headers: Map[String, String]): Future[WSResponse] = {
+  /*
+  * Get Request
+  * @Param URL
+  * @Param headers
+   */
+  override def getRequest(url: String, headers: Map[String, String]): Future[WSResponse] = {
 
     val request: WSRequest = Try(ws.url(url)).getOrElse(throw new IllegalArgumentException("Invalid URL"))
 

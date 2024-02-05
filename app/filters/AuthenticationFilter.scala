@@ -19,25 +19,20 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
    println("Dealing in the nature and also .....")
 
-   val token:Option[String] = for {
-     values <- bearerInfo
-     value <- values.headOption
+ val token:Option[String]  = bearerInfo flatMap(x=>x.headOption.filter(_.nonEmpty))
+ val res: String = token.getOrElse("NONE")
 
-   }yield {
-     println("Indeed interesting")
-     println(value)
-     value
-   }
-
-   val res:String = for {
-     result <- token.get
-   }yield result
+//   val res:String = for {
+//     result <- token.get
+//   }yield result
 
    println("Result nature ......")
 
    //{ case (k, v) => k -> Json.fromString(v.toString) }.toMap
    println(res)
    println(dataMap)
+
+
 
     if (userManager.isAuthenticated(requestHeader)) {
       nextFilter(requestHeader)
