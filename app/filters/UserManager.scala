@@ -1,38 +1,26 @@
 package filters
 
-import akka.actor.TypedActor.dispatcher
-import akka.stream.Materializer
-import play.libs.ws._
 
-import scala.concurrent.ExecutionContext
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import controllers.APIClient
+import play.api.libs.json.{JsObject, Json}
+import play.api.libs.ws.WSResponse
+import play.api.libs.ws.ahc.AhcWSClient
 import play.api.mvc.RequestHeader
-import services.ClientRequestHeader
-import cats.implicits._
-import controllers.{APIClient, TAPIClient}
-import play.api.Play.materializer
-import play.api.libs.json.{JsObject, Json}
-import play.api.libs.ws.ahc.AhcWSClient
-import play.api.libs.ws.{WSClient, WSResponse}
 
-import javax.inject.Inject
-import scala.concurrent.Future
-import scala.concurrent.impl.Promise
-import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.libs.json.{JsObject, Json}
-import play.api.libs.streams.Execution.Implicits.trampoline
-import play.api.libs.ws.WSClient
-import play.api.libs.ws.ahc.AhcWSClient
+import scala.concurrent.{ExecutionContext, Future}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-
-class UserManager @Inject()(implicit cc: ExecutionContext, val mat: Materializer) {
+class UserManager {
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   def isAuthenticated(requestHeader: RequestHeader): Boolean = {
 
     val authorization: String = "Authorization"
-    val wsClient: WSClient = AhcWSClient()
-    val client: APIClient = new APIClient(wsClient)(cc)
+    val system = ActorSystem("my-system")
+    implicit val materializer = ActorMaterializer()(system)
+
+    val client: APIClient =  new  APIClient(ws = AhcWSClient.apply() )
 
 
     val authHeader = requestHeader.headers.toMap
@@ -52,11 +40,23 @@ class UserManager @Inject()(implicit cc: ExecutionContext, val mat: Materializer
       "password" -> password
     }
 
-    val headers: Map[String, String] = Map()
-    val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsObject)
+      val myMap: Map[String, String] = Map(
+        "username" -> username,
+        "password" -> password
+      )
+
+      val jsonObject: JsObject = Json.toJson(myMap).as[JsObject]
+
+      println(jsonObject)
 
 
-    /*
+
+    println("Full jsObject ")
+    println(jsObject)
+    val headers: Map[String, String] = Map()+("Content-Type"->"application/json")
+    val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsonObject)
+
+
     apiResponse.map { response =>
       val status: Int = response.status
       println(s" ... Status :: -----  : ${status}")
@@ -65,7 +65,7 @@ class UserManager @Inject()(implicit cc: ExecutionContext, val mat: Materializer
     }.recover {
       case ex: Throwable => println(s"An error occured : ${ex.getMessage}")
     }
-    */
+
 
     println(requestHeader.headers)
     println(" reached the Authentication mechanism ..")

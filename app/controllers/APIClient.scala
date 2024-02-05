@@ -4,10 +4,14 @@ package controllers
 import play.api.libs.json.JsObject
 import play.api.libs.ws._
 
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import scala.concurrent.Future
 import scala.util.Try
 
-class APIClient(ws: WSClient)(implicit ec: ExecutionContext) extends TAPIClient {
+object APIClient{
+  def apply(ws: WSClient): APIClient = new APIClient(ws)
+}
+  class APIClient @Inject()(ws: WSClient) extends TAPIClient {
 
   /*
   * Post Request
@@ -18,6 +22,8 @@ class APIClient(ws: WSClient)(implicit ec: ExecutionContext) extends TAPIClient 
 
   override def postRequest(url: String, headers: Map[String, String], requestBody: JsObject): Future[WSResponse] = {
 
+    println("requestBody")
+    println(requestBody)
     val request: WSRequest = Try(ws.url(url)).getOrElse(throw new IllegalArgumentException("Invalid URL"))
 
     val requestWithHeaders: WSRequest = headers.foldLeft(request) {
