@@ -4,18 +4,21 @@ package filters
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import controllers.APIClient
-import play.api.libs.json.{JsObject, Json}
+import models.dtos.{Auth, AuthReads._}
+import play.api.libs.json.Format.GenericFormat
+import play.api.libs.json.{JsObject, JsResult, Json}
 import play.api.libs.ws.WSResponse
 import play.api.libs.ws.ahc.AhcWSClient
-import play.api.mvc.RequestHeader
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+
 
 class UserManager {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
-  def isAuthenticated(bearerToken: String): Future[Boolean]   = {
+
+
+  def isAuthenticated(bearerToken: String): Boolean   = {
 
     val bearer = bearerToken.split(" ") match {
       case Array(_, token) => s"Bearer $token"
@@ -39,20 +42,19 @@ class UserManager {
     println(s" Header  result $headers ")
     val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsonObject)
 
-    apiResponse.onComplete {
-      case Failure(exception) =>
-        println(s"An error occured : ${exception.getMessage}")
 
-      case Success(value) =>
-        println(s" ... Status :: -----  : ${value.status}")
-        println(s" ... body :: -----  : ${value.body}")
-    }
 
-    apiResponse.map { response =>
+    val result = apiResponse.map { response =>
       val status: Int = response.status
       println(s" ... Status :: -----  : ${status}")
       val body: String = response.body
       println(s" ... Body :: -----  : ${body}")
+
+    //  val jsonBody: JsValue = Json.toJson(response.body).as[JsObject]
+      println(s" ... Json Body :: -----  : $body")
+      val json = Json.parse(body)
+      val userResult: JsResult[Auth] = json.validate[Auth]
+
       true
     }.recover {
       case ex: Throwable => println(s"An error occured : ${ex.getMessage}")
@@ -62,6 +64,7 @@ class UserManager {
 
     //println(" reached the Authentication mechanism ..")
 
+    true
 
   }
 
