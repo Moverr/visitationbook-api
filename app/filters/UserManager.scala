@@ -4,7 +4,7 @@ package filters
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import controllers.APIClient
-import models.dtos.{Auth, AuthReads._}
+import models.dtos.Auth
 import play.api.libs.json.Format.GenericFormat
 import play.api.libs.json.{JsObject, JsResult, Json}
 import play.api.libs.ws.WSResponse
@@ -16,18 +16,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class UserManager {
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
+  implicit  val system: ActorSystem = ActorSystem("my-system")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
 
+  def isAuthenticated(bearerToken: String): Future[Boolean]   = {
 
-  def isAuthenticated(bearerToken: String): Boolean   = {
+    val bearer: String = validateToken(bearerToken)
 
-    val bearer = bearerToken.split(" ") match {
-      case Array(_, token) => s"Bearer $token"
-      case _ => throw new IllegalArgumentException("Invalid bearer token format")
-    }
-
-    println(s" token result $bearer ")
-    val system = ActorSystem("my-system")
-    implicit val materializer = ActorMaterializer()(system)
 
     val client: APIClient = new APIClient(ws = AhcWSClient.apply())
 
@@ -35,38 +30,43 @@ class UserManager {
     val fullUrl = s"$basicUrl/v1/auth/validate"
 
 
-    val jsonObject: JsObject = Json.toJson(Map[String, String]()).as[JsObject]
-
+    val jsonBody: JsObject = Json.toJson(Map[String, String]()).as[JsObject]
     val headers: Map[String, String] = Map("Authorization" -> bearer)
 
-    println(s" Header  result $headers ")
-    val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsonObject)
+    val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsonBody)
 
 
 
-    val result = apiResponse.map { response =>
-      val status: Int = response.status
-      println(s" ... Status :: -----  : ${status}")
-      val body: String = response.body
-      println(s" ... Body :: -----  : ${body}")
+    val result:Future[Boolean] = apiResponse.map { response =>
 
-    //  val jsonBody: JsValue = Json.toJson(response.body).as[JsObject]
-      println(s" ... Json Body :: -----  : $body")
-      val json = Json.parse(body)
-      val userResult: JsResult[Auth] = json.validate[Auth]
+      val status: Boolean =  response.status match {
+        case 401 => false
+        case _ =>
 
-      true
+          val body: String = response.body
+          val responseBodyJson = Json.parse(body)
+          val userResult: JsResult[Auth] = responseBodyJson.validate[Auth]
+          println(s"${userResult.get.user.userId}")
+          true
+      }
+
+
+      status
     }.recover {
-      case ex: Throwable => println(s"An error occured : ${ex.getMessage}")
+      case ex: Throwable => println(s"An error occurred : ${ex.getMessage}")
         false
     }
 
-
-    //println(" reached the Authentication mechanism ..")
-
-    true
-
+   result
   }
 
+
+  private def validateToken(bearerToken: String): String = {
+    val bearer = bearerToken.split(" ") match {
+      case Array(_, token) => s"Bearer $token"
+      case _ => throw new IllegalArgumentException("Invalid bearer token format")
+    }
+    bearer
+  }
 
 }

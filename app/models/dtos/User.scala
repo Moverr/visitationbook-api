@@ -4,9 +4,9 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
 
 case class User(
-                 user_id: Long,
+                 userId: Long,
                  username: String,
-                 is_active: Boolean,
+                 isActive: Boolean,
                  status: Option[String],
                  roles: Seq[Role],
                  projects: Option[String]
