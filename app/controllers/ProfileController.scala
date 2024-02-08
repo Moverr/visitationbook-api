@@ -1,6 +1,5 @@
 package controllers
 
-import cats.Functor
 import com.google.inject.Singleton
 import controllers.requests.ProfileRequest
 import controllers.responses.GuestResponseWrites.guestWrites
@@ -20,7 +19,6 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
   extends BaseController {
 
 
-  import requests.ProfileRequestReads._
   import responses.ErrorRespnseWrites._
 
 
