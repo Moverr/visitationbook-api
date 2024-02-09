@@ -1,12 +1,11 @@
 package controllers
 
 import controllers.requests.VisitationRequest
-import controllers.requests.VisitationRequestReads.visitationRequestReads
 import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
 import controllers.responses.VisitationResponseWrites._
 import controllers.responses.{ErrorRespnse, VisitationResponse}
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents, WrappedRequest}
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.VisitationServiceImpl
 
 import javax.inject.{Inject, Singleton}
