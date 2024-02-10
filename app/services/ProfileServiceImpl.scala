@@ -77,8 +77,8 @@ class ProfileServiceImpl  @Inject()(profileDAO: ProfileDAO)(implicit executionCo
   def populate(entity: ProfileEntity): ProfileResponse =
     ProfileResponse(
       entity.id,
-      entity.firstname.getOrElse("N/A"),
-      entity.othernames.getOrElse("N/A")
+      entity.firstName.getOrElse("N/A"),
+      entity.otherNames.getOrElse("N/A")
     )
 
 

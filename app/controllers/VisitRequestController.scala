@@ -19,9 +19,6 @@ class VisitRequestController @Inject()(
                                              val service: RequestVisitationImpl
                                            ) extends BaseController {
 
-
-  import requests.VisitRequestReads._
-
   def create(): Action[AnyContent] = Action.async { implicit request =>
 
     try {

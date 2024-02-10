@@ -4,6 +4,7 @@ import controllers.requests.VisitationRequest
 import controllers.responses._
 import models.daos.VisitationDAO
 import models.entities.{ProfileEntity, VisitationEntity, visitationRequestEntity}
+import models.enums.TimeZoneEnum
 import org.joda.time.{DateTime, DateTimeZone}
 
 import java.sql.Timestamp
@@ -20,7 +21,7 @@ class VisitationServiceImpl @Inject()(
    def create(request: VisitationRequest):  Either[Throwable,Future[VisitationResponse]] = {
     val timeOutDate:DateTime =   DateTime.parse(request.timeOut)
     val timeInDate:DateTime =  DateTime.parse(request.timeIn)
-    val  currentDate = DateTime.now(DateTimeZone.forID(request.timezone.getOrElse("UTC")))
+    val  currentDate = DateTime.now(DateTimeZone.forID(request.timezone.getOrElse(TimeZoneEnum.UTC.toString)))
 
 
     if(timeInDate.isBefore(currentDate)){
@@ -40,22 +41,25 @@ class VisitationServiceImpl @Inject()(
         .map(futureResponse => futureResponse.map(record => populate(record)))
 
 
-
    def getById(id: Long): Future[Option[VisitationResponse]] = {
     val response: Future[Option[VisitationEntity]] = visitationDao.get(id)
     response.map(value => value.map(optionValue => populate(optionValue)))
   }
 
-
-  def delete(id: Long): Future[Either[Throwable,Boolean]] = {
-    val response: Future[Option[VisitationEntity]] = visitationDao.get(id)
-    response.map {
-      case Some(value) =>
-        visitationDao.delete(value.id)
-        Right(true)
-
-      case None => Left(new RuntimeException("Record does not exist"))
-    }
+  def populate(entity: (VisitationEntity, Option[ProfileEntity], Option[ProfileEntity])): VisitationResponse = {
+    VisitationResponse(
+      entity._1.id
+      , profileServiceImpl.populate(entity._2)
+      , profileServiceImpl.populate(entity._3)
+      , officeServiceImpl.populate(None)
+      , entity._1.timeIn.map((x: Timestamp) => x.toString)
+      , entity._1.timeOut.map((x: Timestamp) => x.toString)
+      , entity._1.status
+      , "- "
+      , None
+      , entity._1.created_at
+      , entity._1.updated_at
+    )
 
   }
 
@@ -74,21 +78,15 @@ class VisitationServiceImpl @Inject()(
       , entity.updated_at
     )
 
+  def delete(id: Long): Future[Either[Throwable,Boolean]] = {
+    val response: Future[Option[VisitationEntity]] = visitationDao.get(id)
+    response.map {
+      case Some(value) =>
+        visitationDao.delete(value.id)
+        Right(true)
 
-  def populate(entity: (VisitationEntity, Option[ProfileEntity], Option[ProfileEntity])): VisitationResponse = {
-    VisitationResponse(
-      entity._1.id
-      , profileServiceImpl.populate(entity._2)
-      , profileServiceImpl.populate(entity._3)
-      , officeServiceImpl.populate(None)
-      , entity._1.timeIn.map((x: Timestamp) => x.toString)
-      , entity._1.timeOut.map((x: Timestamp) => x.toString)
-      , entity._1.status
-      , "- "
-      , None
-      , entity._1.created_at
-      , entity._1.updated_at
-    )
+      case None => Left(new RuntimeException("Record does not exist"))
+    }
 
   }
 
