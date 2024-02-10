@@ -21,8 +21,7 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
     val requestApi: Option[Seq[String]] = dataMap.get("Raw-Request-URI")
 
-
-
+ 
 
     val token: Option[String] = bearerInfo flatMap (x => x.headOption.filter(_.nonEmpty))
     val res: String = token.getOrElse("NONE")
