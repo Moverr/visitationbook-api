@@ -9,15 +9,15 @@ import java.sql.Timestamp
 
 case class ProfileEntity(
                           id: Long
-                          , user_id: Option[Long]
-                          , firstname: Option[String]
-                          , othernames: Option[String]
+                          , userId: Option[Long]
+                          , firstName: Option[String]
+                          , otherNames: Option[String]
                           , gender: Option[String]
-                          , profile_type: Option[String]
-                          , created_at: Timestamp
-                          , updated_at: Option[Timestamp]
-                          , created_by: Option[Long]
-                          , updated_by: Option[Long]
+                          , profileType: Option[String]
+                          , createdAt: Timestamp
+                          , updatedAt: Option[Timestamp]
+                          , createdBy: Option[Long]
+                          , updatedBy: Option[Long]
                           , status: Option[String]
                         )
 

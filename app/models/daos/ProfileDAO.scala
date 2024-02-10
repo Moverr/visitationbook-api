@@ -2,6 +2,7 @@ package models.daos
 
 import com.google.inject.Inject
 import models.entities.{ProfileEntity, ProfileTable, visitationRequestEntity}
+import models.enums.StatusEnum
 import play.api.db.slick.DatabaseConfigProvider
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
@@ -55,7 +56,7 @@ class ProfileDAO @Inject()( private val dbConfigProvider:DatabaseConfigProvider)
 
 
   def archive(id: Long): Future[Int] = {
-    val query = profiles.filter(_.id === id).map(_.status).update(Some("ARCHIVED"))
+    val query = profiles.filter(_.id === id).map(_.status).update(Some(StatusEnum.ACTIVE.toString))
     db.run(query)
   }
 
