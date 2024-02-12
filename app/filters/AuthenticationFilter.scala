@@ -1,47 +1,77 @@
 package filters
 
 import akka.stream.Materializer
-import annotation.CLogger
+import play.api.Logger
+import play.api.http.Status.UNAUTHORIZED
+import play.api.libs.json.Json
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc._
 
 import javax.inject.Inject
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 
-@CLogger
+
 class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat: Materializer) extends Filter {
+
+  def log = Logger(this.getClass).logger
+
+
+  private def shouldExclude(path: String) = {
+    log.info(s"------------Path :  $path -------")
+
+    path.equalsIgnoreCase("/")|| path.startsWith("/assets/")
+  }
 
   @Override def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
 
-    println("Testing out some info")
-    val ec: ExecutionContext = ExecutionContext.global
-    val dataMap: Map[String, Seq[String]] = requestHeader.headers.toMap
-    val bearerInfo: Option[Seq[String]] = dataMap.get("Authorization")
 
-    val requestApi: Option[Seq[String]] = dataMap.get("Raw-Request-URI")
+    //todo: work on the exclusion
+    val path = requestHeader.uri
 
- 
+    if(shouldExclude(path)){
+      log.info(s" excluded path :  $path -   -")
+      nextFilter(requestHeader)
+    }else{
 
-    val token: Option[String] = bearerInfo flatMap (x => x.headOption.filter(_.nonEmpty))
-    val res: String = token.getOrElse("NONE")
-    println(s" kkkkk   ${requestApi.get.head} ")
+      log.info(s" path needs to be validated :  $path -  -")
+      val ec = ExecutionContext.global
+      val dataMap = requestHeader.headers.toMap
+      val bearerInfo = dataMap.get("Authorization")
 
-    if (!res.equalsIgnoreCase("none")) {
-
-      userManager.isAuthenticated(res)
-        .flatMap {
-          status =>
-            if (status)
-              nextFilter(requestHeader)
-            else
-              Future.successful(Unauthorized("---- BI Unauthorized"))
-        }(ec)
+      val requestApi = dataMap.get("Raw-Request-URI")
 
 
-    } else {
-      Future.successful(Unauthorized("Unauthorized"))
+      val token = bearerInfo flatMap (x => x.headOption.filter(_.nonEmpty))
+      val res = token.getOrElse("NONE")
+      log.info(s"  header :    ${requestApi.get.head} ")
+
+      if (!res.equalsIgnoreCase("none")) {
+
+        userManager.isAuthenticated(res)
+          .flatMap {
+            status =>
+              if (status)
+                nextFilter(requestHeader)
+              else
+                {
+                  import exceptions._
+
+                  val exception = errorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+                  val unAuthorizedAccess = Json.toJson(exception)
+                  Future.successful(Unauthorized(unAuthorizedAccess))
+                }
+
+          }(ec)
+
+
+      } else {
+        //todo: sometimes this may not be debatable based on path..
+        Future.successful(Unauthorized("Unauthorized"))
+      }
+
     }
+
+
 
   }
 }
