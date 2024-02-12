@@ -26,10 +26,10 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
     val requestedAPiPath = requestHeader.uri
 
-    if(shouldExclude(requestedAPiPath)){
+    if (shouldExclude(requestedAPiPath)) {
       log.info(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
       nextFilter(requestHeader)
-    }else{
+    } else {
 
       log.info(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
       val ec = ExecutionContext.global
@@ -50,16 +50,15 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
             status =>
               if (status)
                 nextFilter(requestHeader)
-              else
-                {
+              else {
 
 
-                  val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
-                  val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
+                val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+                val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
 
-                  val unAuthorizedAccess = Json.toJson(unauthorizedJson)
-                  Future.successful(Unauthorized(unAuthorizedAccess))
-                }
+                val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+                Future.successful(Unauthorized(unAuthorizedAccess))
+              }
 
           }(ec)
 
@@ -73,7 +72,6 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
       }
 
     }
-
 
 
   }
