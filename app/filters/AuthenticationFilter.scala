@@ -11,29 +11,27 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 
+import exceptions._
+
 class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat: Materializer) extends Filter {
 
-  def log = Logger(this.getClass).logger
+  private def log = Logger(this.getClass).logger
 
-
-  private def shouldExclude(path: String) = {
+  private def shouldExclude(path: String): Boolean = {
     log.info(s"------------Path :  $path -------")
-
-    path.equalsIgnoreCase("/")|| path.startsWith("/assets/")
+    path.equalsIgnoreCase("/") || path.startsWith("/assets/")
   }
 
   @Override def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
 
+    val requestedAPiPath = requestHeader.uri
 
-    //todo: work on the exclusion
-    val path = requestHeader.uri
-
-    if(shouldExclude(path)){
-      log.info(s" excluded path :  $path -   -")
+    if(shouldExclude(requestedAPiPath)){
+      log.info(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
       nextFilter(requestHeader)
     }else{
 
-      log.info(s" path needs to be validated :  $path -  -")
+      log.info(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
       val ec = ExecutionContext.global
       val dataMap = requestHeader.headers.toMap
       val bearerInfo = dataMap.get("Authorization")
@@ -54,10 +52,12 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
                 nextFilter(requestHeader)
               else
                 {
-                  import exceptions._
 
-                  val exception = errorException("un authorized access", "Unauthorized", UNAUTHORIZED)
-                  val unAuthorizedAccess = Json.toJson(exception)
+
+                  val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+                  val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
+
+                  val unAuthorizedAccess = Json.toJson(unauthorizedJson)
                   Future.successful(Unauthorized(unAuthorizedAccess))
                 }
 
@@ -65,8 +65,11 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
 
       } else {
-        //todo: sometimes this may not be debatable based on path..
-        Future.successful(Unauthorized("Unauthorized"))
+        val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+        val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
+
+        val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+        Future.successful(Unauthorized(unAuthorizedAccess))
       }
 
     }
