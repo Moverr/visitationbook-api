@@ -10,7 +10,9 @@ sealed trait ErrorException {
 }
 
 case class UnauthorizedException(message: String, error: String, statusCode: Int = UNAUTHORIZED) extends ErrorException
+
 case class ForbiddenException(message: String, error: String, statusCode: Int = FORBIDDEN) extends ErrorException
+
 case class NotFoundException(message: String, error: String, statusCode: Int = NOT_FOUND) extends ErrorException
 
 object ErrorException {
