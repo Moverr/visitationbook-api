@@ -15,64 +15,56 @@ import exceptions._
 
 class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat: Materializer) extends Filter {
 
-  private def log = Logger(this.getClass).logger
-
-  private def shouldExclude(path: String): Boolean = {
-    log.info(s"------------Path :  $path -------")
-    path.equalsIgnoreCase("/") || path.startsWith("/assets/")
-  }
+  private implicit val ec = ExecutionContext.global
+  private val exactPaths: Seq[String] = Seq("/", "/")
+  private val relativePaths: Seq[String] = Seq("/assets/")
 
   @Override def apply(nextFilter: RequestHeader => Future[Result])(requestHeader: RequestHeader): Future[Result] = {
 
     val requestedAPiPath = requestHeader.uri
+    log.info(s"------------Path :  $requestedAPiPath -------")
 
-    if (shouldExclude(requestedAPiPath)) {
-      log.info(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
-      nextFilter(requestHeader)
-    } else {
+    shouldExclude(requestedAPiPath) match {
+      case true =>
+        log.info(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
+        nextFilter(requestHeader)
+      case false =>
+        log.info(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
+        val dataMap = requestHeader.headers.toMap
+        val bearerInfo = dataMap.get("Authorization")
+        val requestApi = dataMap.get("Raw-Request-URI")
 
-      log.info(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
-      val ec = ExecutionContext.global
-      val dataMap = requestHeader.headers.toMap
-      val bearerInfo = dataMap.get("Authorization")
+        val token = bearerInfo.flatMap (_.headOption.filter(_.nonEmpty)).getOrElse("NONE")
+        log.info(s"  header :    ${requestApi.get.head} ")
 
-      val requestApi = dataMap.get("Raw-Request-URI")
+        token match {
+          case "NONE" =>
+            val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+            val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
 
+            val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+            Future.successful(Unauthorized(unAuthorizedAccess))
 
-      val token = bearerInfo flatMap (x => x.headOption.filter(_.nonEmpty))
-      val res = token.getOrElse("NONE")
-      log.info(s"  header :    ${requestApi.get.head} ")
+          case _ =>
 
-      if (!res.equalsIgnoreCase("none")) {
-
-        userManager.isAuthenticated(res)
-          .flatMap {
-            status =>
-              if (status)
-                nextFilter(requestHeader)
-              else {
-
-
-                val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
-                val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
-
-                val unAuthorizedAccess = Json.toJson(unauthorizedJson)
-                Future.successful(Unauthorized(unAuthorizedAccess))
+            userManager.isAuthenticated(token)
+              .flatMap {
+                case _: Boolean => nextFilter(requestHeader)
+                case _ =>
+                  val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+                  val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
+                  val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+                  Future.successful(Unauthorized(unAuthorizedAccess))
               }
 
-          }(ec)
-
-
-      } else {
-        val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
-        val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
-
-        val unAuthorizedAccess = Json.toJson(unauthorizedJson)
-        Future.successful(Unauthorized(unAuthorizedAccess))
-      }
+        }
 
     }
 
 
   }
+
+  private def log = Logger(this.getClass).logger
+
+  private def shouldExclude(path: String): Boolean = exactPaths.exists(item => item.equalsIgnoreCase(path)) || relativePaths.exists(item => item.startsWith(path))
 }
