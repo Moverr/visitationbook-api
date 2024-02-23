@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import exceptions._
 
-class AuthenticationFilter @Inject()(userManager: TUserManager, implicit val mat: Materializer) extends Filter {
+class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat: Materializer) extends Filter {
 
   private implicit val ec = ExecutionContext.global
   private val exactPaths: Seq[String] = Seq("/", "/")
