@@ -7,8 +7,6 @@ import models.dtos.Auth
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsResult, Json}
 import play.api.libs.ws.{WSClient, WSResponse}
-import play.api.libs.ws.ahc.AhcWSClient
-
 import scala.concurrent.{ExecutionContext, Future}
 
 trait UserManager {
@@ -23,7 +21,7 @@ class DefaultUserManager(wsClient: WSClient)(implicit ec: ExecutionContext, syst
     log.info(s"Token provided: $bearerToken")
 
     val bearer: String = validateToken(bearerToken)
-    val client: APIClient = new APIClient(wsClient)
+    val apiClient =   new APIClient(wsClient)
 
     val basicUrl = "http://52.207.255.31:8082"
     val fullUrl = s"$basicUrl/v1/auth/validate"
@@ -31,7 +29,7 @@ class DefaultUserManager(wsClient: WSClient)(implicit ec: ExecutionContext, syst
     val jsonBody: JsObject = Json.obj()
     val headers: Map[String, String] = Map("Authorization" -> bearer)
 
-    val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsonBody)
+    val apiResponse: Future[WSResponse] = apiClient.postRequest(fullUrl, headers, jsonBody)
 
     apiResponse.map { response =>
       response.status match {
