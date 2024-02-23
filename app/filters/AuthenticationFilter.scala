@@ -13,7 +13,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import exceptions._
 
-class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat: Materializer) extends Filter {
+class AuthenticationFilter @Inject()(userManager: TUserManager, implicit val mat: Materializer) extends Filter {
 
   private implicit val ec = ExecutionContext.global
   private val exactPaths: Seq[String] = Seq("/", "/")
@@ -25,25 +25,26 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
     log.info(s"------------Path :  $requestedAPiPath -------")
 
     val rexte = shouldExclude(requestedAPiPath)
-   println("Passing the information ")
-    log.debug("building it closely ")
+    log.info("Passing the information ")
+    log.info("building it closely ")
 
     rexte match {
       case true =>
-        println(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
+        log.info(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
         nextFilter(requestHeader)
       case false =>
-        println(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
+        log.info(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
         val dataMap = requestHeader.headers.toMap
         val bearerInfo = dataMap.get("Authorization")
         val requestApi = dataMap.get("Raw-Request-URI")
 
-        val token = bearerInfo.flatMap (_.headOption.filter(_.nonEmpty)).getOrElse("NONE")
-        println(s"  header :    ${requestApi.get.head} ")
-        println(s"  token :    ${token} ")
+        val token = bearerInfo.flatMap(_.headOption.filter(_.nonEmpty)).getOrElse("NONE")
+
 
         token match {
           case "NONE" =>
+            log.info(s" No token provided  ")
+
             val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
             val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
 
@@ -51,7 +52,7 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
             Future.successful(Unauthorized(unAuthorizedAccess))
 
           case _ =>
-
+            log.info(s"  token  provided :    ${token} ")
             userManager.isAuthenticated(token)
               .flatMap {
                 case _: Boolean => nextFilter(requestHeader)
@@ -69,7 +70,7 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
   }
 
-  private def log = Logger(this.getClass).logger
+  private lazy val log = Logger(this.getClass).logger
 
   private def shouldExclude(path: String): Boolean = exactPaths.exists(item => item.equalsIgnoreCase(path)) || relativePaths.exists(item => item.startsWith(path))
 }

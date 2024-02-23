@@ -1,72 +1,69 @@
 package filters
 
-
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import controllers.APIClient
 import models.dtos.Auth
-import play.api.libs.json.Format.GenericFormat
+import play.api.Logger
 import play.api.libs.json.{JsObject, JsResult, Json}
-import play.api.libs.ws.WSResponse
+import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.libs.ws.ahc.AhcWSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
+trait UserManager {
+  def isAuthenticated(bearerToken: String): Future[Boolean]
+}
 
-class UserManager {
-  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+class DefaultUserManager(wsClient: WSClient)(implicit ec: ExecutionContext, system: ActorSystem, materializer: ActorMaterializer) extends UserManager {
 
-  implicit  val system: ActorSystem = ActorSystem("my-system")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  private val log = Logger(getClass)
 
-  def isAuthenticated(bearerToken: String): Future[Boolean]   = {
+  override def isAuthenticated(bearerToken: String): Future[Boolean] = {
+    log.info(s"Token provided: $bearerToken")
 
     val bearer: String = validateToken(bearerToken)
+    val client: APIClient = new APIClient(wsClient)
 
-
-    val client: APIClient = new APIClient(ws = AhcWSClient.apply())
-
-    val basicUrl = "http://52.207.255.31:8082";
+    val basicUrl = "http://52.207.255.31:8082"
     val fullUrl = s"$basicUrl/v1/auth/validate"
 
-
-    val jsonBody: JsObject = Json.toJson(Map[String, String]()).as[JsObject]
+    val jsonBody: JsObject = Json.obj()
     val headers: Map[String, String] = Map("Authorization" -> bearer)
 
     val apiResponse: Future[WSResponse] = client.postRequest(fullUrl, headers, jsonBody)
 
-
-
-    val result:Future[Boolean] = apiResponse.map { response =>
-
-      val status: Boolean =  response.status match {
-        case 401 => false
+    apiResponse.map { response =>
+      response.status match {
+        case 401 =>
+          log.warn("Unauthorized request")
+          false
         case _ =>
-
           val body: String = response.body
           val responseBodyJson = Json.parse(body)
           val userResult: JsResult[Auth] = responseBodyJson.validate[Auth]
-          println(s"${userResult.get.user.userId}")
-          true
+          userResult.fold(
+            errors => {
+              log.error(s"Failed to validate user: ${errors.mkString(", ")}")
+              false
+            },
+            auth => {
+              log.info(s"User ${auth.user.userId} authenticated successfully")
+              true
+            }
+          )
       }
-
-
-      status
     }.recover {
-      case ex: Throwable => println(s"An error occurred : ${ex.getMessage}")
+      case ex: Throwable =>
+        log.error(s"An error occurred: ${ex.getMessage}")
         false
     }
-
-   result
   }
 
-
   private def validateToken(bearerToken: String): String = {
-    val bearer = bearerToken.split(" ") match {
+    bearerToken.split(" ") match {
       case Array(_, token) => s"Bearer $token"
       case _ => throw new IllegalArgumentException("Invalid bearer token format")
     }
-    bearer
   }
-
 }

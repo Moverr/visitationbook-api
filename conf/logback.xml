@@ -44,8 +44,7 @@
   </root>
 
   <root level="INFO">
-    <appender-ref ref="ASYNCFILE" />
-    <appender-ref ref="ASYNCSTDOUT" />
+
     <appender-ref ref="FILE" />
     <appender-ref ref="STDOUT" />
   </root>
