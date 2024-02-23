@@ -24,18 +24,23 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
     val requestedAPiPath = requestHeader.uri
     log.info(s"------------Path :  $requestedAPiPath -------")
 
-    shouldExclude(requestedAPiPath) match {
+    val rexte = shouldExclude(requestedAPiPath)
+   println("Passing the information ")
+    log.debug("building it closely ")
+
+    rexte match {
       case true =>
-        log.info(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
+        println(s" excluded requestedAPiPath :  $requestedAPiPath -   -")
         nextFilter(requestHeader)
       case false =>
-        log.info(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
+        println(s" requestedAPiPath needs to be validated :  $requestedAPiPath -  -")
         val dataMap = requestHeader.headers.toMap
         val bearerInfo = dataMap.get("Authorization")
         val requestApi = dataMap.get("Raw-Request-URI")
 
         val token = bearerInfo.flatMap (_.headOption.filter(_.nonEmpty)).getOrElse("NONE")
-        log.info(s"  header :    ${requestApi.get.head} ")
+        println(s"  header :    ${requestApi.get.head} ")
+        println(s"  token :    ${token} ")
 
         token match {
           case "NONE" =>
