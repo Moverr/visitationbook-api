@@ -66,6 +66,7 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
                       val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
                       Unauthorized(unAuthorizedAccess)
+
                     case _: BadRequestException =>
                       val exception = ErrorException(exc.getLocalizedMessage, exc.getMessage, BAD_REQUEST)
                       val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
@@ -103,7 +104,7 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
   }
 
-  private lazy val log = Logger(this.getClass).logger
+  private lazy val log = Logger(getClass).logger
 
   private def shouldExclude(path: String): Boolean = exactPaths.exists(item => item.equalsIgnoreCase(path)) || relativePaths.exists(item => item.startsWith(path))
 }

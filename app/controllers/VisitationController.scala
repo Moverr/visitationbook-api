@@ -1,9 +1,9 @@
 package controllers
 
 import controllers.requests.VisitationRequest
-import controllers.responses.ErrorRespnseWrites.ErrorResponseWrites
+import controllers.responses.ErrorResponseWrites.ErrorResponseWrites
 import controllers.responses.VisitationResponseWrites._
-import controllers.responses.{ErrorRespnse, VisitationResponse}
+import controllers.responses.{ErrorResponse, VisitationResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.VisitationServiceImpl
@@ -29,8 +29,8 @@ class VisitationController @Inject()(
       match {
         case Left(exception) =>
           exception match {
-            case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
-            case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+            case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
+            case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
           }
 
         case Right(result) => result.flatMap(response => Future.successful(
@@ -57,7 +57,7 @@ class VisitationController @Inject()(
     val response: Future[Option[VisitationResponse]] = service.getById(id)
     response.flatMap {
       case Some(value) => Future.successful(Ok(Json.toJson(value)))
-      case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Item does not exist"))))
+      case None => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, "Item does not exist"))))
     }
   }
 
@@ -67,8 +67,8 @@ class VisitationController @Inject()(
     res.flatMap {
       case Left(exception) =>
         exception match {
-          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
-          case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
+          case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
       case Right(value) => Future.successful(Ok)
     }
