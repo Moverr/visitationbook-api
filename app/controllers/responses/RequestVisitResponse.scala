@@ -1,7 +1,5 @@
 package controllers.responses
 
-import controllers.responses.OfficeResponseWrites._
-import controllers.responses.ProfileResponseWrites._
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{JsPath, Writes}
 

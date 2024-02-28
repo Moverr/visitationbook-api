@@ -2,7 +2,6 @@ package controllers
 
 import com.google.inject.Singleton
 import controllers.requests.ProfileRequest
-import controllers.responses.GuestResponseWrites.guestWrites
 import controllers.responses.{ErrorResponse, ProfileResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
@@ -17,9 +16,6 @@ import scala.concurrent.Future
 @Singleton
 class ProfileController @Inject()(val controllerComponents: ControllerComponents)(val serviceImpl: ProfileServiceImpl)
   extends BaseController {
-
-
-  import responses.ErrorResponseWrites._
 
 
   def create: Action[AnyContent] = Action.async { implicit request =>

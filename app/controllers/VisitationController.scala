@@ -1,8 +1,6 @@
 package controllers
 
 import controllers.requests.VisitationRequest
-import controllers.responses.ErrorResponseWrites.ErrorResponseWrites
-import controllers.responses.VisitationResponseWrites._
 import controllers.responses.{ErrorResponse, VisitationResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}

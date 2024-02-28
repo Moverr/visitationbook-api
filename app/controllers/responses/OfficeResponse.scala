@@ -8,7 +8,7 @@ import play.api.libs.json.{JsPath, Writes}
 
 
 case class OfficeResponse(id:Long,name:String)
-object OfficeResponseWrites {
+object OfficeResponse {
   implicit  val officeResponse:Writes[OfficeResponse]=(
     (JsPath \ "id").write[Long] and
       (JsPath \ "first_name").write[String]

@@ -1,7 +1,5 @@
 package controllers.responses
 
-import play.api.libs.functional.syntax.unlift
-import play.api.libs.json.{JsPath, Writes}
 import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
 import play.api.libs.json.{JsPath, Writes}
 
@@ -18,7 +16,7 @@ object HostReponse {
     (JsPath \ "id").write[Long] and
       (JsPath \ "firstName").write[String] and
       (JsPath \ "lastName").write[String]
-    )(unlift(ProfileResponse.unapply))
+    )(unlift(HostReponse.unapply))
 
 
 }

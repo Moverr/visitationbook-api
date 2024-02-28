@@ -9,7 +9,7 @@ sealed trait Error
 
 case class ErrorResponse(code: Int, message: String) extends Error
 
-object ErrorResponseWrites {
+object ErrorResponse {
   implicit val ErrorResponseWrites: Writes[ErrorResponse] =
     ( (JsPath \ "code").write[Int] and (JsPath \ "message").write[String] )(unlift(ErrorResponse.unapply))
 }
