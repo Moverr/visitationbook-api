@@ -110,7 +110,10 @@ class AuthenticationFilter @Inject()
 
                   log.info(s" Digging deep : ${urlMap}")
 
-                  auth.user.roles.flatMap(_.permissions.find(_.resource.equalsIgnoreCase(urlMap)))
+
+                  auth.user.roles.flatMap(_.permissions.find(permission =>
+                      permission.resource.equalsIgnoreCase(urlMap) && validateCrudpermission(method, permission)
+                    ))
                     .headOption
                     .map {
                       permission =>
@@ -153,6 +156,18 @@ class AuthenticationFilter @Inject()
       case _ => ""
 
     }
+  }
+
+  private def validateCrudpermission(method: String, permission: models.dtos.Permission): Boolean = {
+    method match {
+      case "GET" => !permission.read.equalsIgnoreCase("NONE")
+      case "POST" => !permission.create.equalsIgnoreCase("NONE")
+      case "PUT" => !permission.update.equalsIgnoreCase("NONE")
+      case "OPTIONS" => !permission.update.equalsIgnoreCase("NONE")
+      case "DELETE" => !permission.read.equalsIgnoreCase("NONE")
+      case _ => false
+    }
+
   }
 
 
