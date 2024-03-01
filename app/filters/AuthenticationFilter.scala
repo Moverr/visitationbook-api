@@ -110,18 +110,21 @@ class AuthenticationFilter @Inject()
 
                   log.info(s" Digging deep : ${urlMap}")
 
-                  var permission: Option[models.dtos.Permission] = auth.user.roles.flatMap(_.permissions.find(_.resource.equalsIgnoreCase(urlMap))).headOption
+                  auth.user.roles.flatMap(_.permissions.find(_.resource.equalsIgnoreCase(urlMap)))
+                    .headOption
+                    .map {
+                      permission =>
+                        cache.set("auth", auth)
+                        nextFilter(requestHeader)
+                    }
+                    .getOrElse {
+                      val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+                      val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
+                      val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+                      Future.successful(Unauthorized(unAuthorizedAccess))
+                    }
 
-                  if (permission.isEmpty) {
-                    val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
-                    val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
-                    val unAuthorizedAccess = Json.toJson(unauthorizedJson)
-                    Future.successful(Unauthorized(unAuthorizedAccess))
 
-                  } else {
-                    cache.set("auth", auth)
-                    nextFilter(requestHeader)
-                  }
                 case _ =>
                   val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
                   val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
