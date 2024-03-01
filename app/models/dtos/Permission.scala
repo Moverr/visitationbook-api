@@ -3,7 +3,7 @@ package models.dtos
 import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
 
-case class Permission(
+ case class Permission(
                        resource: String,
                          create: String,
                          read: String,

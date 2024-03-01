@@ -1,6 +1,6 @@
 
 
-name := """visitation"""
+name := """gamba"""
 organization := "com.khoodi-labs"
 
 version := "1.0-SNAPSHOT"
@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
   ws,
   caffeine,
   filters,
-
+  cacheApi,
   "org.hibernate" % "hibernate-core" % "5.4.9.Final",
   "org.postgresql" % "postgresql" % "9.4-1201-jdbc41",
   "org.scalactic" %% "scalactic" % "3.2.2",

@@ -12,8 +12,17 @@ import scala.concurrent.{ExecutionContext, Future}
 import exceptions._
 import jdk.jshell.spi.ExecutionControl.InternalException
 import models.dtos.Auth
+import play.api.cache._
 
-class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat: Materializer) extends Filter {
+import java.time.Duration
+import scala.collection.mutable
+
+class AuthenticationFilter @Inject()
+(userManager: UserManager
+ , implicit val mat: Materializer
+ , val cache: SyncCacheApi
+)
+  extends Filter {
 
   private implicit val ec = ExecutionContext.global
   private val exactPaths: Seq[String] = Seq("/", "/")
@@ -79,7 +88,7 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
                       val exceptiontoJson = Json.toJson(exceptionJson)
                       InternalServerError(exceptiontoJson)
 
-                    case _  =>
+                    case _ =>
                       val exception = ErrorException(exc.getLocalizedMessage, exc.getMessage, INTERNAL_SERVER_ERROR)
                       val exceptionJson = ExceptionHandler.errorExceptionWrites.writes(exception)
                       val exceptiontoJson = Json.toJson(exceptionJson)
@@ -89,7 +98,30 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
                   Future.successful(exceptionStatus)
 
-                case Right(auth: Auth) => nextFilter(requestHeader)
+                case Right(auth: Auth) =>
+                  //todo: bases on the info find out if the user has access to the url.
+                  val headerArray = requestHeader
+                  val url = headerArray.uri
+                  val method = headerArray.method
+                  log.info(s" Header method :: ---  ${method}  :: url ${url}")
+
+                  val urlMap = extractBaseURL(url);
+
+
+                  log.info(s" Digging deep : ${urlMap}")
+
+                  var permission: Option[models.dtos.Permission] = auth.user.roles.flatMap(_.permissions.find(_.resource.equalsIgnoreCase(urlMap))).headOption
+
+                  if (permission.isEmpty) {
+                    val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
+                    val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
+                    val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+                    Future.successful(Unauthorized(unAuthorizedAccess))
+
+                  } else {
+                    cache.set("auth", auth)
+                    nextFilter(requestHeader)
+                  }
                 case _ =>
                   val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
                   val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
@@ -103,6 +135,23 @@ class AuthenticationFilter @Inject()(userManager: UserManager, implicit val mat:
 
 
   }
+
+  private val urlMapper = mutable.HashMap[String, String](
+    "/v1/request/visit/" -> "VISITATIONREQUESTS",
+    "/v1/request/visit/area" -> "VISITATIONREQUESTS"
+  )
+
+  private def extractBaseURL(url: String): String = {
+    val parts = url.split("/")
+    parts match {
+      case Array("", "v1", "request", "visit", _*) => {
+        urlMapper("/v1/request/visit/")
+      }
+      case _ => ""
+
+    }
+  }
+
 
   private lazy val log = Logger(getClass).logger
 
