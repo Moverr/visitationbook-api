@@ -15,30 +15,37 @@ import scala.concurrent.Future
 
 @Singleton
 class VisitRequestController @Inject()(
-                                             val controllerComponents: ControllerComponents,
-                                             val service: RequestVisitationImpl
-                                             , val cache: SyncCacheApi
-                                           ) extends BaseController {
-
+                                        val controllerComponents: ControllerComponents,
+                                        val service: RequestVisitationImpl
+                                        , val cache: SyncCacheApi
+                                      ) extends BaseController {
 
 
   def create(): Action[AnyContent] = Action.async { implicit request =>
 
     try {
-      val auth: Option[Auth] =  cache.get("auth")
-
-      val json = request.body.asJson.get
-      val visitationsRequest: VisitRequest =  json.as[VisitRequest]
-
-      service.create(visitationsRequest)
+      cache.get("auth")
       match {
-        case Left(exception) =>
-          exception match {
-            case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
-            case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+        case Some(auth) =>
+          request.body.asJson match {
+            case Some(json) =>
+              val visitationsRequest: VisitRequest = json.as[VisitRequest]
+              service.create(auth, visitationsRequest)
+              match {
+                case Left(exception) =>
+                  val errorResponse =  exception match {
+                    case e: RuntimeException =>  ErrorResponse(BAD_REQUEST, e.getMessage)
+                    case _ => ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error")
+                  }
+                  Future.successful(BadRequest(Json.toJson(errorResponse)))
+                case Right(result: Future[RequestVisitResponse]) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
+              }
+
+            case None => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, "Request body is not in JSON format"))))
+
           }
 
-        case Right(result:Future[RequestVisitResponse]) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
+        case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
       }
 
     }
@@ -48,8 +55,19 @@ class VisitRequestController @Inject()(
   }
 
   def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
-    val response: Future[Seq[RequestVisitResponse]] = service.list( offset,limit)
-    response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
+
+    cache.get("auth")
+    service.list(offset, limit) match {
+      case Left(value) =>
+      case Right(value) =>
+    }
+
+     /*
+    .flatMap(value =>
+
+
+      Future.successful(Ok(Json.toJson(value))))
+    */
   }
 
 

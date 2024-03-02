@@ -118,7 +118,7 @@ class AuthenticationFilter @Inject()
                         nextFilter(requestHeader)
                     }
                     .getOrElse {
-                      log.deb("User not authorized")
+                      log.debug("User not authorized")
                       val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
                       val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
