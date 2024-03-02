@@ -48,6 +48,7 @@ class VisitRequestController @Inject()(
         case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
       }
 
+
     }
     catch {
       case e: Exception => Future.successful(BadRequest(e.getLocalizedMessage))
