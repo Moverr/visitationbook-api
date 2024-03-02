@@ -15,8 +15,8 @@ import scala.concurrent.Future
 
 @Singleton
 class VisitRequestController @Inject()(
-                                        val controllerComponents: ControllerComponents,
-                                        val service: RequestVisitationImpl
+                                          val controllerComponents: ControllerComponents
+                                        , val service: RequestVisitationImpl
                                         , val cache: SyncCacheApi
                                       ) extends BaseController {
 
@@ -33,8 +33,8 @@ class VisitRequestController @Inject()(
               service.create(auth, visitationsRequest)
               match {
                 case Left(exception) =>
-                  val errorResponse =  exception match {
-                    case e: RuntimeException =>  ErrorResponse(BAD_REQUEST, e.getMessage)
+                  val errorResponse = exception match {
+                    case e: RuntimeException => ErrorResponse(BAD_REQUEST, e.getMessage)
                     case _ => ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error")
                   }
                   Future.successful(BadRequest(Json.toJson(errorResponse)))
@@ -56,18 +56,14 @@ class VisitRequestController @Inject()(
 
   def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
 
-    cache.get("auth")
-    service.list(offset, limit) match {
-      case Left(value) =>
-      case Right(value) =>
+    cache.get("auth") match {
+      case Some(auth: Auth) => service.list(offset, limit) match {
+        case Left(e: Exception) => Future.successful(BadRequest(e.getLocalizedMessage))
+        case Right(response: Future[Seq[RequestVisitResponse]]) => response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
+      }
+      case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
     }
 
-     /*
-    .flatMap(value =>
-
-
-      Future.successful(Ok(Json.toJson(value))))
-    */
   }
 
 
