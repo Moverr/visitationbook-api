@@ -55,7 +55,6 @@ class VisitRequestController @Inject()(
   }
 
   def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
-
     cache.get("auth") match {
       case Some(auth: Auth) => service.list(offset, limit) match {
         case Left(e: Exception) => Future.successful(BadRequest(e.getLocalizedMessage))
@@ -63,7 +62,6 @@ class VisitRequestController @Inject()(
       }
       case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
     }
-
   }
 
 
