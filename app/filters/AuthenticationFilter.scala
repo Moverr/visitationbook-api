@@ -104,12 +104,8 @@ class AuthenticationFilter @Inject()
                   val url = headerArray.uri
                   val method = headerArray.method
                   log.info(s" Header method :: ---  ${method}  :: url ${url}")
-
                   val urlMap = extractBaseURL(url);
-
-
                   log.info(s" Digging deep : ${urlMap}")
-
 
                   auth.user.roles.flatMap(_.permissions.find(permission =>
                       permission.resource.equalsIgnoreCase(urlMap) && validateCrudpermission(method, permission)
@@ -118,9 +114,11 @@ class AuthenticationFilter @Inject()
                     .map {
                       permission =>
                         cache.set("auth", auth)
+                        log.info("Caching set succesfuly")
                         nextFilter(requestHeader)
                     }
                     .getOrElse {
+                      log.deb("User not authorized")
                       val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
                       val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)

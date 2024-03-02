@@ -3,7 +3,9 @@ package services
 import controllers.requests.VisitRequest
 import controllers.responses.{OfficeResponse, ProfileResponse, RequestVisitResponse}
 import models.daos.RequestVisitationDAO
+import models.dtos.Auth
 import models.entities.{ProfileEntity, visitationRequestEntity}
+import models.enums.StatusEnum
 import org.joda.time.DateTime
 
 import java.sql.Timestamp
@@ -19,12 +21,11 @@ class RequestVisitationImpl @Inject()(
                                        , implicit val executionContext: ExecutionContext
                                      ) {
 
-  def create(request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
+  def create(authorizedUser: Auth, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
-    //DateTime.parse(request.timeOut)
+
     val timeInDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
     val timeOutDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
-    //todo:validate that the user does not enter the same records twice.
 
 
       if ( (timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
@@ -35,7 +36,7 @@ class RequestVisitationImpl @Inject()(
 
           val visit: visitationRequestEntity = visitationRequestEntity(0L, Some(request.hostId), Some(request.guestId), request.officeId, request.departmentId, request.invitationType, new Timestamp(System.currentTimeMillis()), None, None, None, timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
             , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , Some("PENDING")
+            , Some(StatusEnum.PENDING.toString)
           )
           val response = requestVisitationDao.create(visit)
           Right(response.map((record) => populate(record))(executionContext))

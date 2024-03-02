@@ -2,6 +2,8 @@ package controllers
 
 import controllers.requests.VisitRequest
 import controllers.responses.{ErrorResponse, RequestVisitResponse}
+import models.dtos.Auth
+import play.api.cache.SyncCacheApi
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.RequestVisitationImpl
@@ -15,11 +17,15 @@ import scala.concurrent.Future
 class VisitRequestController @Inject()(
                                              val controllerComponents: ControllerComponents,
                                              val service: RequestVisitationImpl
+                                             , val cache: SyncCacheApi
                                            ) extends BaseController {
+
+
 
   def create(): Action[AnyContent] = Action.async { implicit request =>
 
     try {
+      val auth: Option[Auth] =  cache.get("auth")
 
       val json = request.body.asJson.get
       val visitationsRequest: VisitRequest =  json.as[VisitRequest]
@@ -64,7 +70,7 @@ class VisitRequestController @Inject()(
           case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
           case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
-      case Right(value) => Future.successful(Ok)
+      case Right(_) => Future.successful(Ok)
     }
 
   }
