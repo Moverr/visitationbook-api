@@ -8,7 +8,7 @@ import models.entities.{ProfileEntity, visitationRequestEntity}
 import models.enums.StatusEnum
 import org.joda.time.DateTime
 import play.api.Logger
-import utils.Util.extractOwner
+import utils.Util.{extractOwner, parseDateTime}
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -30,12 +30,12 @@ class RequestVisitationImpl @Inject()(
 
     val ownerId: Option[Long] = extractOwner(authorizedUser,RESOURCE)
 
-  val dataresponse =   ownerId match {
+  val dataResponse =   ownerId match {
       case Some(_) =>
 
-        val inDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
-        val outDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
 
+        val inDate: Option[DateTime] = request.timeIn.flatMap(record=>parseDateTime(record).toOption)
+        val outDate: Option[DateTime] = request.timeOut.flatMap(record=>parseDateTime(record).toOption)
 
 
         if ((inDate.isDefined && outDate.isDefined) && (inDate.get.isAfter(outDate.get)  )) {
@@ -64,7 +64,7 @@ class RequestVisitationImpl @Inject()(
 
       case None => Left(new RuntimeException("User is not authorized "))
     }
-    dataresponse
+    dataResponse
   }
 
 

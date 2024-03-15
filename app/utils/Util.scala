@@ -1,12 +1,11 @@
 package utils
 
 
+import cats.implicits._
 import models.dtos.Auth
 import models.enums.PermissionLevelEnum
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-
-import java.sql.Timestamp
 class Util {
   def extractOwner(authorizedUser: Auth,RESOURCE:String): Option[Long] = {
     authorizedUser.user.roles
@@ -16,12 +15,9 @@ class Util {
       .map(_ => authorizedUser.user.userId)
   }
 
-  import cats.implicits._
-  private def parseDateTime(str: String):  Either[Throwable, DateTime] = {
-    Either.catchNonFatal(DateTime.parse(str, DateTimeFormat.forPattern("your_date_time_format_here")))
 
-  }
-
+  private def parseDateTime(str: String):  Either[Throwable, DateTime] =
+    Either.catchNonFatal(DateTime.parse(str, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")))
 
 }
 
