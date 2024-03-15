@@ -24,8 +24,9 @@ class VisitRequestController @Inject()(
   def create(): Action[AnyContent] = Action.async { implicit request =>
 
     try {
-      cache.get("auth")
-      match {
+      val auths:Option[Auth] = cache.get("auth")
+
+      auths   match {
         case Some(auth) =>
           request.body.asJson match {
             case Some(json) =>
@@ -56,8 +57,10 @@ class VisitRequestController @Inject()(
   }
 
   def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
-    cache.get("auth") match {
-      case Some(auth: Auth) => service.list(offset, limit) match {
+
+    val auths:Option[Auth] = cache.get("auth")
+    auths match {
+      case Some(auth) => service.list(auth,offset, limit) match {
         case Left(e: Exception) => Future.successful(BadRequest(e.getLocalizedMessage))
         case Right(response: Future[Seq[RequestVisitResponse]]) => response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
       }

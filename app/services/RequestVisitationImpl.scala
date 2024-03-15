@@ -1,12 +1,14 @@
 package services
 
 import controllers.requests.VisitRequest
-import controllers.responses.{OfficeResponse, ProfileResponse, RequestVisitResponse}
+import controllers.responses.RequestVisitResponse
 import models.daos.RequestVisitationDAO
 import models.dtos.Auth
 import models.entities.{ProfileEntity, visitationRequestEntity}
 import models.enums.StatusEnum
 import org.joda.time.DateTime
+import play.api.Logger
+import utils.Util.extractOwner
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -21,53 +23,131 @@ class RequestVisitationImpl @Inject()(
                                        , implicit val executionContext: ExecutionContext
                                      ) {
 
+  private val RESOURCE: String = "VISITATIONREQUESTS"
+  private lazy val log = Logger(getClass).logger
+
   def create(authorizedUser: Auth, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
+    val ownerId: Option[Long] = extractOwner(authorizedUser,RESOURCE)
 
-    val timeInDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
-    val timeOutDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
+  val dataresponse =   ownerId match {
+      case Some(_) =>
+
+        val inDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
+        val outDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
 
 
-    if ((timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
-      Left(new RuntimeException("Time in Date is less than Time out Date"))
+
+        if ((inDate.isDefined && outDate.isDefined) && (inDate.get.isAfter(outDate.get)  )) {
+          Left(new RuntimeException("Time in Date is less than Time out Date"))
+        }
+        else {
+          val visit: visitationRequestEntity = visitationRequestEntity(
+            0L
+            , Some(request.hostId)
+            , Some(request.guestId)
+            , request.officeId
+            , request.departmentId
+            , request.invitationType
+            , new Timestamp(System.currentTimeMillis())
+            , ownerId
+            , None
+            , None
+            , inDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , outDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , Some(StatusEnum.PENDING.toString)
+          )
+          val response = requestVisitationDao.create(visit)
+
+          Right(response.map(populate))
+        }
+
+      case None => Left(new RuntimeException("User is not authorized "))
     }
-    else {
+    dataresponse
+  }
 
 
-      val visit: visitationRequestEntity = visitationRequestEntity(
-        0L
-        , Some(request.hostId)
-        , Some(request.guestId)
-        , request.officeId
-        , request.departmentId
-        , request.invitationType
-        , new Timestamp(System.currentTimeMillis())
-        , Some(authorizedUser.user.userId)
-        , None
-        , None
-        , timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
-        , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
-        , Some(StatusEnum.PENDING.toString)
-      )
-      val response = requestVisitationDao.create(visit)
-      Right(response.map((record) => populate(record))(executionContext))
+  def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
+
+    val response = requestVisitationDao.getById(id)
+      .flatMap {
+        case Some(value) =>
+          ???
+          //Left(new RuntimeException("Time in Date is less than Time out Date"))
+        case None =>
+            ???
+          //Left(new RuntimeException("Time in Date is less than Time out Date"))
+      }
+
+    Right(response.recover {
+      case e: Throwable => throw new RuntimeException("Error occurred during visit update", e)
+    })
+
+    /*
+
+  visitationRequest.map {
+      case Some(existingRequest) =>
+        val timeInDate: Option[DateTime] = request.timeIn.map(DateTime.parse)
+        val timeOutDate: Option[DateTime] = request.timeOut.map(DateTime.parse)
+
+        if ((timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
+          Left(new RuntimeException("Time in Date is less than Time out Date"))
+        }
+        else {
+
+          val visit: visitationRequestEntity = visitationRequestEntity(
+            0L
+            , Some(request.hostId)
+            , Some(request.guestId)
+            , request.officeId
+            , request.departmentId
+            , request.invitationType
+            , new Timestamp(System.currentTimeMillis())
+            , Some(authorizedUser.user.userId)
+            , None
+            , None
+            , timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , Some(StatusEnum.PENDING.toString)
+          )
+
+          val responseData = for {
+            response <- requestVisitationDao.update(id, visit)
+          } yield populate(response)
+
+          Right(responseData)
+        }
+
+
+
+      case None => Left(new RuntimeException("Time in Date is less than Time out Date"))
     }
+
+    */
+
 
   }
 
-  def list(offset: Long, limit: Long): Either[Throwable, Future[Seq[RequestVisitResponse]]] = {
-    val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.list(offset, limit)
-    val records = response.map { record => record.map(item => populate(item)) }
+
+  def list(authorizedUser: Auth, offset: Long, limit: Long): Either[Throwable, Future[Seq[RequestVisitResponse]]] = {
+
+    log.info("List Information ")
+
+    val ownerId: Option[Long] = extractOwner(authorizedUser,RESOURCE)
+
+    val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] =
+      requestVisitationDao.list(ownerId, offset, limit)
+
+    val records: Future[Seq[RequestVisitResponse]] = response.map(_.map(populate))
     Right(records)
   }
-
 
   def getById(id: Long): Future[Option[RequestVisitResponse]] = {
     val response: Future[Option[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.get(id)
     response.map((value) => value.map((optionValue) => populate(optionValue)))
   }
-
 
   def delete(id: Long): Future[Either[Throwable, Boolean]] = {
     val response = requestVisitationDao.get(id)
@@ -75,11 +155,10 @@ class RequestVisitationImpl @Inject()(
       case Some(value) =>
         requestVisitationDao.delete(value._1.id)
         Right(true)
-
       case None => Left(new RuntimeException("Record does not exist"))
     })
-
   }
+
 
 
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
@@ -99,7 +178,6 @@ class RequestVisitationImpl @Inject()(
 
   }
 
-
   def populate(entity: visitationRequestEntity): RequestVisitResponse = {
     RequestVisitResponse(
       entity.id,
@@ -116,5 +194,6 @@ class RequestVisitationImpl @Inject()(
     )
 
   }
+
 
 }
