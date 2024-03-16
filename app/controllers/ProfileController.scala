@@ -2,8 +2,7 @@ package controllers
 
 import com.google.inject.Singleton
 import controllers.requests.ProfileRequest
-import controllers.responses.GuestResponseWrites.guestWrites
-import controllers.responses.{ErrorRespnse, ProfileResponse}
+import controllers.responses.{ErrorResponse, ProfileResponse}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.ProfileServiceImpl
@@ -19,9 +18,6 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
   extends BaseController {
 
 
-  import responses.ErrorRespnseWrites._
-
-
   def create: Action[AnyContent] = Action.async { implicit request =>
 
     println("Blessed day")
@@ -33,8 +29,8 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
     result match {
       case Left(exception) =>
         exception match {
-          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
-          case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
+          case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
 
       case Right(result) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
@@ -55,7 +51,7 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
     val response: Future[Option[ProfileResponse]] = serviceImpl.getById(id)
     response.flatMap {
       case Some(value) => Future.successful(Ok(Json.toJson(value)))
-      case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Item does not exist"))))
+      case None => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, "Item does not exist"))))
     }
   }
 
@@ -67,8 +63,8 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
     res.flatMap {
       case Left(exception) =>
         exception match {
-          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
-          case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
+          case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
       case Right(_) => Future.successful(Ok)
     }
@@ -81,8 +77,8 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
     res.flatMap {
       case Left(exception) =>
         exception match {
-          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, exception.getMessage))))
-          case _ => Future.successful(InternalServerError(Json.toJson(ErrorRespnse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+          case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
+          case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
       case Right(_) => Future.successful(Ok)
     }
@@ -98,7 +94,7 @@ class ProfileController @Inject()(val controllerComponents: ControllerComponents
 
     result.flatMap {
       case Some(response) => Future.successful(Ok(Json.toJson(response)))
-      case None => Future.successful(BadRequest(Json.toJson(ErrorRespnse(BAD_REQUEST, "Profile does not exist"))))
+      case None => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, "Profile does not exist"))))
     }
 
   }

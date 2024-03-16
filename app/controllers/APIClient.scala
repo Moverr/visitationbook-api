@@ -8,10 +8,26 @@ import javax.inject.Inject
 import scala.concurrent.Future
 import scala.util.Try
 
-object APIClient{
-  def apply(ws: WSClient): APIClient = new APIClient(ws)
+trait TAPIClient {
+
+  /*
+    * Post Request
+    * @Param URL
+    * @Param headers
+    * @Param requestBody
+     */
+  def postRequest(url: String, headers: Map[String, String], requestBody: JsObject): Future[WSResponse]
+
+  /*
+  * Get Request
+  * @Param URL
+  * @Param headers
+   */
+  def getRequest(url: String, headers: Map[String, String]): Future[WSResponse]
 }
-  class APIClient @Inject()(ws: WSClient) extends TAPIClient {
+
+
+   class APIClient @Inject()(ws: WSClient) extends TAPIClient {
 
   /*
   * Post Request
