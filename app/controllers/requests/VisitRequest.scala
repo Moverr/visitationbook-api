@@ -4,8 +4,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
 
 /*
- the host and guest must be declared prior.
-  if  not create profiles for the host and guest
+ @moverr@gmail.com
  */
 
 case class VisitRequest(
@@ -13,10 +12,10 @@ case class VisitRequest(
                               guestId: Long,
                               officeId: Option[Long],
                               departmentId: Option[Long],
-                              timeIn:Option[String],
-                              timeOut: Option[String],
+                              timeIn:Long,
+                              timeOut: Long,
                               invitationType:Option[String]
-                            )
+                       )
 
 
 object VisitRequest {
@@ -26,8 +25,8 @@ object VisitRequest {
       (JsPath \ "guest_id").read[Long] and
       (JsPath \ "office_id").readNullable[Long] and
       (JsPath \ "department_id").readNullable[Long] and
-      (JsPath \ "time_in").readNullable[String] and
-      (JsPath \ "time_out").readNullable[String] and
+      (JsPath \ "time_in").read[Long] and //epoch standard
+      (JsPath \ "time_out").read[Long] and //epoch standard
       (JsPath \ "inv_type").readNullable[String]
 
     ) (VisitRequest.apply _)

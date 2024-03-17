@@ -1,67 +1,155 @@
 package services
 
 import controllers.requests.VisitRequest
-import controllers.responses.{OfficeResponse, ProfileResponse, RequestVisitResponse}
+import controllers.responses.RequestVisitResponse
 import models.daos.RequestVisitationDAO
+import models.dtos.Auth
 import models.entities.{ProfileEntity, visitationRequestEntity}
-import org.joda.time.DateTime
+import models.enums.StatusEnum
+import org.joda.time.{DateTime, DateTimeZone}
+import play.api.Logger
+import utils.Util.{extractOwner, getTimeStamp}
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.math.Ordered.orderingToOrdered
 
 @Singleton
 class RequestVisitationImpl @Inject()(
                                        val requestVisitationDao: RequestVisitationDAO
-                                       ,val profileServiceImpl: ProfileServiceImpl
-                                       ,val officeServiceImpl:OfficeServiceImpl
+                                       , val profileServiceImpl: ProfileServiceImpl
+                                       , val officeServiceImpl: OfficeServiceImpl
                                        , implicit val executionContext: ExecutionContext
                                      ) {
 
-  def create(request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
+  private val RESOURCE: String = "VISITATIONREQUESTS"
+  private lazy val log = Logger(getClass).logger
 
-    //DateTime.parse(request.timeOut)
-    val timeInDate: Option[DateTime] = request.timeIn.map((x: String) => DateTime.parse(x))
-    val timeOutDate: Option[DateTime] = request.timeOut.map((x: String) => DateTime.parse(x))
-    //todo:validate that the user does not enter the same records twice.
+  def create(authorizedUser: Auth, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
+    val dataResponse = extractOwner(authorizedUser, RESOURCE) match {
+      case Some(ownerId) =>
 
-      if ( (timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
-          Left(new RuntimeException("Time in Date is less than Time out Date"))
-      }
-    else{
+        val timeInDate: DateTime = new DateTime(request.timeIn, DateTimeZone.UTC)
+        val timeOutDate: DateTime = new DateTime(request.timeOut, DateTimeZone.UTC)
 
+        val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
 
-          val visit: visitationRequestEntity = visitationRequestEntity(0L, Some(request.hostId), Some(request.guestId), request.officeId, request.departmentId, request.invitationType, new Timestamp(System.currentTimeMillis()), None, None, None, timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , Some("PENDING")
+        log.info(s" Current  time ${currentDate} ")
+        log.info(s" Starting time ${timeInDate} ")
+        log.info(s" ending  time ${timeOutDate} ")
+//(currentDate.isAfter(timeInDate)) ||
+
+        if (timeInDate.isAfter(timeOutDate)) {
+          Left(new RuntimeException("Invalid time range"))
+        }
+        else {
+          val visit: visitationRequestEntity = visitationRequestEntity(
+            0L
+            , Some(request.hostId)
+            , Some(request.guestId)
+            , request.officeId
+            , request.departmentId
+            , request.invitationType
+            , new Timestamp(System.currentTimeMillis())
+            , Some(ownerId)
+            , None
+            , None
+            , Some(getTimeStamp(timeInDate))
+            , Some(getTimeStamp(timeOutDate))
+            , Some(StatusEnum.PENDING.toString)
           )
           val response = requestVisitationDao.create(visit)
-          Right(response.map((record) => populate(record))(executionContext))
 
+          Right(response.map(populate))
+        }
+
+      case None => Left(new RuntimeException("User is not authorized "))
+    }
+    dataResponse
+  }
+
+
+  def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
+
+
+    val response = requestVisitationDao.getById(id)
+      .flatMap {
+        case Some(value) =>
+          ???
+        //Left(new RuntimeException("Time in Date is less than Time out Date"))
+        case None =>
+          ???
+        //Left(new RuntimeException("Time in Date is less than Time out Date"))
       }
 
-  }
+    Right(response.recover {
+      case e: Throwable => throw new RuntimeException("Error occurred during visit update", e)
+    })
 
-  def list(offset: Long, limit: Long): Future[Seq[RequestVisitResponse]] = {
-    val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.list(offset, limit)
+    /*
 
-    response.map {
-      record => record.map(item => populate(item))
+  visitationRequest.map {
+      case Some(existingRequest) =>
+        val timeInDate: Option[DateTime] = request.timeIn.map(DateTime.parse)
+        val timeOutDate: Option[DateTime] = request.timeOut.map(DateTime.parse)
+
+        if ((timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
+          Left(new RuntimeException("Time in Date is less than Time out Date"))
+        }
+        else {
+
+          val visit: visitationRequestEntity = visitationRequestEntity(
+            0L
+            , Some(request.hostId)
+            , Some(request.guestId)
+            , request.officeId
+            , request.departmentId
+            , request.invitationType
+            , new Timestamp(System.currentTimeMillis())
+            , Some(authorizedUser.user.userId)
+            , None
+            , None
+            , timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , Some(StatusEnum.PENDING.toString)
+          )
+
+          val responseData = for {
+            response <- requestVisitationDao.update(id, visit)
+          } yield populate(response)
+
+          Right(responseData)
+        }
+
+
+
+      case None => Left(new RuntimeException("Time in Date is less than Time out Date"))
     }
 
+    */
+
+
   }
 
 
+  def list(authorizedUser: Auth, offset: Long, limit: Long): Either[Throwable, Future[Seq[RequestVisitResponse]]] = {
 
+    log.info("List Information ")
+
+    val ownerId: Option[Long] = extractOwner(authorizedUser, RESOURCE)
+
+    val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] =
+      requestVisitationDao.list(ownerId, offset, limit)
+
+    val records: Future[Seq[RequestVisitResponse]] = response.map(_.map(populate))
+    Right(records)
+  }
 
   def getById(id: Long): Future[Option[RequestVisitResponse]] = {
     val response: Future[Option[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] = requestVisitationDao.get(id)
     response.map((value) => value.map((optionValue) => populate(optionValue)))
   }
-
-
 
   def delete(id: Long): Future[Either[Throwable, Boolean]] = {
     val response = requestVisitationDao.get(id)
@@ -69,10 +157,8 @@ class RequestVisitationImpl @Inject()(
       case Some(value) =>
         requestVisitationDao.delete(value._1.id)
         Right(true)
-
       case None => Left(new RuntimeException("Record does not exist"))
     })
-
   }
 
 
@@ -82,17 +168,16 @@ class RequestVisitationImpl @Inject()(
       , profileServiceImpl.populate(entity._2)
       , profileServiceImpl.populate(entity._3)
       , officeServiceImpl.populate(None)
-      , entity._1.startDate.map((x: Timestamp) => x.toString)
-      , entity._1.endDate.map((x: Timestamp) => x.toString)
-      , entity._1.status.getOrElse(" - ")
-      , entity._1.invType.getOrElse(" - ")
+      , entity._1.startDate.map((x: Timestamp) => x.toLocalDateTime.toString)
+      , entity._1.endDate.map((x: Timestamp) => x.toLocalDateTime.toString)
+      , entity._1.status.getOrElse("NONE")
+      , entity._1.invType.getOrElse("NONE")
       , None
-      , Some(entity._1.createdAt)
-      , entity._1.updatedAt
+      , Some(entity._1.createdAt.toLocalDateTime.toString)
+      , entity._1.updatedAt.map(x=>x.toLocalDateTime.toString)
     )
 
   }
-
 
   def populate(entity: visitationRequestEntity): RequestVisitResponse = {
     RequestVisitResponse(
@@ -100,15 +185,16 @@ class RequestVisitationImpl @Inject()(
       profileServiceImpl.populate(None),
       profileServiceImpl.populate(None),
       officeServiceImpl.populate(entity.officeId),
-      entity.startDate.map((x: Timestamp) => x.toString)
-      , entity.endDate.map((x: Timestamp) => x.toString)
-      , entity.status.getOrElse("-")
-      , entity.invType.getOrElse(" - ")
+      entity.startDate.map((x: Timestamp) => x.toLocalDateTime.toString)
+      , entity.endDate.map((x: Timestamp) => x.toLocalDateTime.toString)
+      , entity.status.getOrElse("NONE")
+      , entity.invType.getOrElse("NONE")
       , None
-      , Some(entity.createdAt)
-      , entity.updatedAt
+      , Some(entity.createdAt.toLocalDateTime.toString)
+      , entity.updatedAt.map(x=>x.toLocalDateTime.toString)
     )
 
   }
+
 
 }
