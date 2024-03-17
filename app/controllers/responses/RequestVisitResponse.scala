@@ -16,8 +16,8 @@ case class RequestVisitResponse(
                                  status: String,
                                  invType: String,
                                  timezone: Option[String],
-                                 createdAt: Option[Timestamp],
-                                 updatedAt: Option[Timestamp]
+                                 createdAt: Option[String],
+                                 updatedAt: Option[String]
                                )
 
 
@@ -32,8 +32,8 @@ object RequestVisitResponse {
       (JsPath \ "status").write[String] and
       (JsPath \ "inv_type").write[String] and
       (JsPath \ "timezone").write[Option[String]] and
-      (JsPath \ "created_at").write[Option[Timestamp]] and
-      (JsPath \ "updated_at").write[Option[Timestamp]]
+      (JsPath \ "created_at").write[Option[String]] and
+      (JsPath \ "updated_at").write[Option[String]]
     )(unlift(RequestVisitResponse.unapply))
 
 }

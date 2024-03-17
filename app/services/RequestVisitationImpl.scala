@@ -38,8 +38,9 @@ class RequestVisitationImpl @Inject()(
         log.info(s" Current  time ${currentDate} ")
         log.info(s" Starting time ${timeInDate} ")
         log.info(s" ending  time ${timeOutDate} ")
+//(currentDate.isAfter(timeInDate)) ||
 
-        if ((currentDate.isAfter(timeInDate)) || timeInDate.isAfter(timeOutDate)) {
+        if (timeInDate.isAfter(timeOutDate)) {
           Left(new RuntimeException("Invalid time range"))
         }
         else {
@@ -172,8 +173,8 @@ class RequestVisitationImpl @Inject()(
       , entity._1.status.getOrElse("NONE")
       , entity._1.invType.getOrElse("NONE")
       , None
-      , Some(entity._1.createdAt)
-      , entity._1.updatedAt
+      , Some(entity._1.createdAt.toLocalDateTime.toString)
+      , entity._1.updatedAt.map(x=>x.toLocalDateTime.toString)
     )
 
   }
@@ -189,8 +190,8 @@ class RequestVisitationImpl @Inject()(
       , entity.status.getOrElse("NONE")
       , entity.invType.getOrElse("NONE")
       , None
-      , Some(entity.createdAt)
-      , entity.updatedAt
+      , Some(entity.createdAt.toLocalDateTime.toString)
+      , entity.updatedAt.map(x=>x.toLocalDateTime.toString)
     )
 
   }
