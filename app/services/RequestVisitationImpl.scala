@@ -6,9 +6,9 @@ import models.daos.RequestVisitationDAO
 import models.dtos.Auth
 import models.entities.{ProfileEntity, visitationRequestEntity}
 import models.enums.StatusEnum
-import org.joda.time.DateTime
+import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
-import utils.Util.{extractOwner, parseDateTime}
+import utils.Util.{extractOwner, getTimeStamp}
 
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
@@ -27,13 +27,19 @@ class RequestVisitationImpl @Inject()(
 
   def create(authorizedUser: Auth, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
-    val dataResponse =  extractOwner(authorizedUser, RESOURCE) match {
+    val dataResponse = extractOwner(authorizedUser, RESOURCE) match {
       case Some(ownerId) =>
 
-        val startTimeDate: Option[DateTime] = request.timeIn.flatMap(record => parseDateTime(record).toOption)
-        val endTimeDate: Option[DateTime] = request.timeOut.flatMap(record => parseDateTime(record).toOption)
+        val timeInDate: DateTime = new DateTime(request.timeIn, DateTimeZone.UTC)
+        val timeOutDate: DateTime = new DateTime(request.timeOut, DateTimeZone.UTC)
 
-        if (startTimeDate.isEmpty || endTimeDate.isEmpty || startTimeDate.get.isAfter(endTimeDate.get)) {
+        val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
+
+        log.info(s" Current  time ${currentDate} ")
+        log.info(s" Starting time ${timeInDate} ")
+        log.info(s" ending  time ${timeOutDate} ")
+
+        if ((currentDate.isAfter(timeInDate)) || timeInDate.isAfter(timeOutDate)) {
           Left(new RuntimeException("Invalid time range"))
         }
         else {
@@ -48,8 +54,8 @@ class RequestVisitationImpl @Inject()(
             , Some(ownerId)
             , None
             , None
-            , startTimeDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , endTimeDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , Some(getTimeStamp(timeInDate))
+            , Some(getTimeStamp(timeOutDate))
             , Some(StatusEnum.PENDING.toString)
           )
           val response = requestVisitationDao.create(visit)
@@ -161,8 +167,8 @@ class RequestVisitationImpl @Inject()(
       , profileServiceImpl.populate(entity._2)
       , profileServiceImpl.populate(entity._3)
       , officeServiceImpl.populate(None)
-      , entity._1.startDate.map((x: Timestamp) => x.toString)
-      , entity._1.endDate.map((x: Timestamp) => x.toString)
+      , entity._1.startDate.map((x: Timestamp) => x.toLocalDateTime.toString)
+      , entity._1.endDate.map((x: Timestamp) => x.toLocalDateTime.toString)
       , entity._1.status.getOrElse("NONE")
       , entity._1.invType.getOrElse("NONE")
       , None
@@ -178,8 +184,8 @@ class RequestVisitationImpl @Inject()(
       profileServiceImpl.populate(None),
       profileServiceImpl.populate(None),
       officeServiceImpl.populate(entity.officeId),
-      entity.startDate.map((x: Timestamp) => x.toString)
-      , entity.endDate.map((x: Timestamp) => x.toString)
+      entity.startDate.map((x: Timestamp) => x.toLocalDateTime.toString)
+      , entity.endDate.map((x: Timestamp) => x.toLocalDateTime.toString)
       , entity.status.getOrElse("NONE")
       , entity.invType.getOrElse("NONE")
       , None

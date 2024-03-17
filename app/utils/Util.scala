@@ -22,7 +22,9 @@ class Util {
   def parseDateTime(str: String): Either[Throwable, DateTime] =
     Either.catchNonFatal(DateTime.parse(str, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")))
 
-  def getTimeStamp(dateTime: DateTime): Timestamp = new Timestamp(dateTime.getMillis)
+  def getTimeStamp(dateTime: Long): Timestamp = new Timestamp(dateTime)
+
+  def getTimeStamp(dateTime: DateTime): Timestamp = getTimeStamp(dateTime.getMillis)
 
   def getTimeStamp(dateTime: Option[DateTime]): Option[Timestamp] = dateTime.map(getTimeStamp)
 
@@ -40,6 +42,8 @@ object Util {
   def getTimeStamp(dateTime: DateTime): Timestamp = apply().getTimeStamp(dateTime)
 
   def getTimeStamp(dateTime: Option[DateTime]): Option[Timestamp] = apply().getTimeStamp(dateTime)
+
+  def getTimeStamp(dateTime: Long): Timestamp = apply().getTimeStamp(dateTime)
 
 
 }
