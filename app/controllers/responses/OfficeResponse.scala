@@ -11,7 +11,7 @@ case class OfficeResponse(id:Long,name:String)
 object OfficeResponse {
   implicit  val officeResponse:Writes[OfficeResponse]=(
     (JsPath \ "id").write[Long] and
-      (JsPath \ "first_name").write[String]
+      (JsPath \ "name").write[String]
     )(unlift(OfficeResponse.unapply))
 
 }

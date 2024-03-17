@@ -1,39 +1,56 @@
 package controllers
 
-import controllers.requests.VisitRequest
+import controllers.requests.{VisitRequest, VisitationRequest}
 import controllers.responses.{ErrorResponse, RequestVisitResponse}
-import play.api.libs.json.Json
+import models.dtos.Auth
+import play.api.Logger
+import play.api.cache.SyncCacheApi
+
+
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.RequestVisitationImpl
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
+import play.api.libs.json._
 
 @Singleton
 class VisitRequestController @Inject()(
-                                             val controllerComponents: ControllerComponents,
-                                             val service: RequestVisitationImpl
-                                           ) extends BaseController {
+                                        val controllerComponents: ControllerComponents
+                                        , val service: RequestVisitationImpl
+                                        , val cache: SyncCacheApi
+                                      ) extends BaseController {
+
+  private lazy val log = Logger(getClass).logger
 
   def create(): Action[AnyContent] = Action.async { implicit request =>
 
+
     try {
+      val auths: Option[Auth] = cache.get("auth")
 
-      val json = request.body.asJson.get
-      val visitationsRequest: VisitRequest =  json.as[VisitRequest]
+      auths match {
+        case Some(auth) =>
+          log.info(s" Womder match Provided Auth --- ${auth.user.userId} ")
 
-      service.create(visitationsRequest)
-      match {
-        case Left(exception) =>
-          exception match {
-            case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
-            case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
+          val json = request.body.asJson.get
+          val visitationsRequest: VisitRequest = json.as[VisitRequest]
+          service.create(auth, visitationsRequest)
+          match {
+            case Left(exception) =>
+              val errorResponse = exception match {
+                case e: RuntimeException => ErrorResponse(BAD_REQUEST, e.getMessage)
+                case _ => ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error")
+              }
+              Future.successful(BadRequest(Json.toJson(errorResponse)))
+            case Right(result: Future[RequestVisitResponse]) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
           }
 
-        case Right(result:Future[RequestVisitResponse]) => result.flatMap(response => Future.successful(Ok(Json.toJson(response))))
+
+        case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
       }
+
 
     }
     catch {
@@ -42,8 +59,15 @@ class VisitRequestController @Inject()(
   }
 
   def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
-    val response: Future[Seq[RequestVisitResponse]] = service.list( offset,limit)
-    response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
+
+    val auths: Option[Auth] = cache.get("auth")
+    auths match {
+      case Some(auth) => service.list(auth, offset, limit) match {
+        case Left(e: Exception) => Future.successful(BadRequest(e.getLocalizedMessage))
+        case Right(response: Future[Seq[RequestVisitResponse]]) => response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
+      }
+      case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
+    }
   }
 
 
@@ -64,7 +88,7 @@ class VisitRequestController @Inject()(
           case e: RuntimeException => Future.successful(BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, exception.getMessage))))
           case _ => Future.successful(InternalServerError(Json.toJson(ErrorResponse(INTERNAL_SERVER_ERROR, "Internal Sever Error"))))
         }
-      case Right(value) => Future.successful(Ok)
+      case Right(_) => Future.successful(Ok)
     }
 
   }

@@ -6,37 +6,34 @@ import play.api.libs.json.{JsPath, Writes}
 import java.sql.Timestamp
 
 
-
 case class RequestVisitResponse(
                                  id: Long,
                                  host: Option[ProfileResponse],
                                  guest: Option[ProfileResponse],
                                  office: Option[OfficeResponse],
-                                 startDate: Option[String],
-                                 endDate: Option[String],
+                                 timeInDate: Option[String],
+                                 timeOutDate: Option[String],
                                  status: String,
-                                 invType: String, 
+                                 invType: String,
                                  timezone: Option[String],
-                                 createdAt: Option[Timestamp],
-                                 updatedAt: Option[Timestamp]
+                                 createdAt: Option[String],
+                                 updatedAt: Option[String]
                                )
 
 
-
-
 object RequestVisitResponse {
-  implicit val requestVisitResponseWrites:Writes[RequestVisitResponse]=(
+  implicit val requestVisitResponseWrites: Writes[RequestVisitResponse] = (
     (JsPath \ "id").write[Long] and
       (JsPath \ "host").write[Option[ProfileResponse]] and
       (JsPath \ "guest").write[Option[ProfileResponse]] and
       (JsPath \ "office").write[Option[OfficeResponse]] and
-      (JsPath \ "start_date").write[Option[String]] and
-      (JsPath \ "end_date").write[Option[String]] and
+      (JsPath \ "time_in").write[Option[String]] and
+      (JsPath \ "time_out").write[Option[String]] and
       (JsPath \ "status").write[String] and
       (JsPath \ "inv_type").write[String] and
       (JsPath \ "timezone").write[Option[String]] and
-      (JsPath \ "created_at").write[Option[Timestamp]] and
-      (JsPath \ "updated_at").write[Option[Timestamp]]
+      (JsPath \ "created_at").write[Option[String]] and
+      (JsPath \ "updated_at").write[Option[String]]
     )(unlift(RequestVisitResponse.unapply))
 
 }

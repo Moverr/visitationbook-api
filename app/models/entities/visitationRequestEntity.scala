@@ -5,6 +5,8 @@ import slick.jdbc.PostgresProfile.api._
 import slick.lifted.{ForeignKeyQuery, TableQuery}
 import slick.sql.SqlProfile.ColumnOption.SqlType
 
+import models.enums.StatusEnum
+
 import java.sql.Timestamp
 
 
