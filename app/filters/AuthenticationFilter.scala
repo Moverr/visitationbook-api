@@ -18,11 +18,9 @@ import java.time.Duration
 import scala.collection.mutable
 
 class AuthenticationFilter @Inject()
-(userManager: UserManager
- , implicit val mat: Materializer
- , val cache: SyncCacheApi
-)
+(userManager: UserManager  , implicit val mat: Materializer , val cache: SyncCacheApi)
   extends Filter {
+
 
   private implicit val ec = ExecutionContext.global
   private val exactPaths: Seq[String] = Seq("/", "/")
@@ -35,6 +33,7 @@ class AuthenticationFilter @Inject()
 
     val isUrlExcluded = shouldExclude(requestedAPiPath)
 
+    log.info(s"ROUTES : in the path of the pack")
 
     isUrlExcluded match {
       case true =>
@@ -48,6 +47,7 @@ class AuthenticationFilter @Inject()
 
         val token = bearerInfo.flatMap(_.headOption.filter(_.nonEmpty)).getOrElse("NONE")
 
+        log.info(s"Token done ''''''''  "+token)
 
         token match {
           case "NONE" =>
@@ -76,10 +76,14 @@ class AuthenticationFilter @Inject()
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
                       Unauthorized(unAuthorizedAccess)
 
-                    case _: BadRequestException =>
+                    case e: BadRequestException =>
+                      println("Test the links")
+                      log.info(e.getMessage)
+                      log.debug("Waganers eane aeahe ae ")
                       val exception = ErrorException(exc.getLocalizedMessage, exc.getMessage, BAD_REQUEST)
                       val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
+                      log.debug(e.getMessage)
                       BadRequest(unAuthorizedAccess)
 
                     case _: InternalException =>
@@ -141,20 +145,16 @@ class AuthenticationFilter @Inject()
   }
 
   private val urlMapper = mutable.HashMap[String, String](
-    "/v1/request/visit/" -> "VISITATIONREQUESTS",
-    "/v1/request/visit/area" -> "VISITATIONREQUESTS"
+    "/v1/request/visit" -> "VISITATIONREQUESTS"
   )
 
-  private def extractBaseURL(url: String): String = {
-    val parts = url.split("/")
-    parts match {
-      case Array("", "v1", "request", "visit", _*) => {
-        urlMapper("/v1/request/visit/")
-      }
-      case _ => ""
-
-    }
+  def extractBaseURL(url: String): String = {
+    val baseUrls = urlMapper.keys.toList
+    val matchingBaseUrl = baseUrls.find(url.startsWith)
+    matchingBaseUrl.map(urlMapper(_)).getOrElse("")
   }
+
+
 
   private def validateCrudpermission(method: String, permission: models.dtos.Permission): Boolean = {
     method match {

@@ -13,7 +13,6 @@ import utils.Util.{extractOwner, parseDateTime}
 import java.sql.Timestamp
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-import scala.math.Ordered.orderingToOrdered
 
 @Singleton
 class RequestVisitationImpl @Inject()(
@@ -28,18 +27,14 @@ class RequestVisitationImpl @Inject()(
 
   def create(authorizedUser: Auth, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
-    val ownerId: Option[Long] = extractOwner(authorizedUser,RESOURCE)
+    val dataResponse =  extractOwner(authorizedUser, RESOURCE) match {
+      case Some(ownerId) =>
 
-  val dataResponse =   ownerId match {
-      case Some(_) =>
+        val startTimeDate: Option[DateTime] = request.timeIn.flatMap(record => parseDateTime(record).toOption)
+        val endTimeDate: Option[DateTime] = request.timeOut.flatMap(record => parseDateTime(record).toOption)
 
-
-        val inDate: Option[DateTime] = request.timeIn.flatMap(record=>parseDateTime(record).toOption)
-        val outDate: Option[DateTime] = request.timeOut.flatMap(record=>parseDateTime(record).toOption)
-
-
-        if ((inDate.isDefined && outDate.isDefined) && (inDate.get.isAfter(outDate.get)  )) {
-          Left(new RuntimeException("Time in Date is less than Time out Date"))
+        if (startTimeDate.isEmpty || endTimeDate.isEmpty || startTimeDate.get.isAfter(endTimeDate.get)) {
+          Left(new RuntimeException("Invalid time range"))
         }
         else {
           val visit: visitationRequestEntity = visitationRequestEntity(
@@ -50,11 +45,11 @@ class RequestVisitationImpl @Inject()(
             , request.departmentId
             , request.invitationType
             , new Timestamp(System.currentTimeMillis())
-            , ownerId
+            , Some(ownerId)
             , None
             , None
-            , inDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , outDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , startTimeDate.map((x: DateTime) => new Timestamp(x.getMillis))
+            , endTimeDate.map((x: DateTime) => new Timestamp(x.getMillis))
             , Some(StatusEnum.PENDING.toString)
           )
           val response = requestVisitationDao.create(visit)
@@ -75,10 +70,10 @@ class RequestVisitationImpl @Inject()(
       .flatMap {
         case Some(value) =>
           ???
-          //Left(new RuntimeException("Time in Date is less than Time out Date"))
+        //Left(new RuntimeException("Time in Date is less than Time out Date"))
         case None =>
-            ???
-          //Left(new RuntimeException("Time in Date is less than Time out Date"))
+          ???
+        //Left(new RuntimeException("Time in Date is less than Time out Date"))
       }
 
     Right(response.recover {
@@ -135,7 +130,7 @@ class RequestVisitationImpl @Inject()(
 
     log.info("List Information ")
 
-    val ownerId: Option[Long] = extractOwner(authorizedUser,RESOURCE)
+    val ownerId: Option[Long] = extractOwner(authorizedUser, RESOURCE)
 
     val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] =
       requestVisitationDao.list(ownerId, offset, limit)
@@ -158,7 +153,6 @@ class RequestVisitationImpl @Inject()(
       case None => Left(new RuntimeException("Record does not exist"))
     })
   }
-
 
 
   def populate(entity: (visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])): RequestVisitResponse = {
