@@ -38,7 +38,6 @@ class RequestVisitationImpl @Inject()(
         log.info(s" Current  time ${currentDate} ")
         log.info(s" Starting time ${timeInDate} ")
         log.info(s" ending  time ${timeOutDate} ")
-//(currentDate.isAfter(timeInDate)) ||
 
         if (timeInDate.isAfter(timeOutDate)) {
           Left(new RuntimeException("Invalid time range"))
@@ -72,10 +71,25 @@ class RequestVisitationImpl @Inject()(
 
   def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
+    val resp = extractOwner(authorizedUser, RESOURCE)
 
+    resp match {
+      case Some(value) =>
+      val response = requestVisitationDao.getById(id)
+     val responseData =  response.flatMap {
+          case Some(entity:visitationRequestEntity) => ???
+          case None => ???
+        }
+
+      case None => ???
+    }
+
+
+    /*
     val response = requestVisitationDao.getById(id)
       .flatMap {
-        case Some(value) =>
+        case Some(entity:visitationRequestEntity) =>
+
           ???
         //Left(new RuntimeException("Time in Date is less than Time out Date"))
         case None =>
@@ -86,6 +100,7 @@ class RequestVisitationImpl @Inject()(
     Right(response.recover {
       case e: Throwable => throw new RuntimeException("Error occurred during visit update", e)
     })
+    */
 
     /*
 
