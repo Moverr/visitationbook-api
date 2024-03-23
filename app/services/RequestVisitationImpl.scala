@@ -39,7 +39,7 @@ class RequestVisitationImpl @Inject()(
         log.info(s" Starting time ${timeInDate} ")
         log.info(s" ending  time ${timeOutDate} ")
 
-        if (timeInDate.isAfter(timeOutDate)) {
+        if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
           Left(new RuntimeException("Invalid time range"))
         }
         else {
@@ -72,26 +72,48 @@ class RequestVisitationImpl @Inject()(
   def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
     val resp = extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
 
-    val timeInDate = new DateTime(request.timeIn, DateTimeZone.UTC)
-    val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
-    val visit = visitationRequestEntity(
-      id,
-      Some(request.hostId),
-      Some(request.guestId),
-      request.officeId,
-      request.departmentId,
-      request.invitationType,
-      new Timestamp(System.currentTimeMillis()),
-      Some(authorizedUser.user.userId),
-      None,
-      None,
-      Some(getTimeStamp(timeInDate)),
-      Some(getTimeStamp(timeOutDate)),
-      Some(StatusEnum.PENDING.toString)
-    )
-    val updatedEntity = requestVisitationDao.update(id, visit)
-    val response = updatedEntity.map(populate)
-    Right(response)
+    val response = resp match {
+      case ownerID:Long =>
+
+        val timeInDate = new DateTime(request.timeIn, DateTimeZone.UTC)
+        val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
+        val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
+
+        log.info(s" Current  time ${currentDate} ")
+        log.info(s" Starting time ${timeInDate} ")
+        log.info(s" ending  time ${timeOutDate} ")
+
+
+
+        if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate) ) {
+          Left(new RuntimeException("Invalid time range"))
+        }
+        else{
+          val visit = visitationRequestEntity(
+            id,
+            Some(request.hostId),
+            Some(request.guestId),
+            request.officeId,
+            request.departmentId,
+            request.invitationType,
+            new Timestamp(System.currentTimeMillis()),
+            Some(authorizedUser.user.userId),
+            None,
+            Some(ownerID),
+            Some(getTimeStamp(timeInDate)),
+            Some(getTimeStamp(timeOutDate)),
+            Some(StatusEnum.PENDING.toString)
+          )
+          val updatedEntity = requestVisitationDao.update(id, visit)
+          val response = updatedEntity.map(populate)
+          Right(response)
+        }
+
+
+      case None => Left(new RuntimeException("User is not authorized "))
+    }
+    response
+
   }
 
 
