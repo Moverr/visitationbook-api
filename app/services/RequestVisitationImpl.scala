@@ -70,6 +70,15 @@ class RequestVisitationImpl @Inject()(
 
 
   def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
+
+    val xt = for{
+        resp <- extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
+      response <- resp match {
+        case  ownerID: Long  =>
+      }
+    }
+
+
     val resp = extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
 
     val response = resp match {
