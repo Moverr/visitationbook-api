@@ -35,9 +35,9 @@ class RequestVisitationImpl @Inject()(
 
         val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
 
-        log.info(s" Current  time ${currentDate} ")
-        log.info(s" Starting time ${timeInDate} ")
-        log.info(s" ending  time ${timeOutDate} ")
+        log.info(s" Current  time $currentDate ")
+        log.info(s" Starting time $timeInDate ")
+        log.info(s" ending  time $timeOutDate ")
 
         if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
           Left(new RuntimeException("Invalid time range"))
@@ -73,22 +73,21 @@ class RequestVisitationImpl @Inject()(
     val resp = extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
 
     val response = resp match {
-      case ownerID:Long =>
+      case ownerID: Long =>
 
         val timeInDate = new DateTime(request.timeIn, DateTimeZone.UTC)
         val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
         val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
 
-        log.info(s" Current  time ${currentDate} ")
-        log.info(s" Starting time ${timeInDate} ")
-        log.info(s" ending  time ${timeOutDate} ")
+        log.info(s" Current  time $currentDate ")
+        log.info(s" Starting time $timeInDate ")
+        log.info(s" ending  time $timeOutDate ")
 
 
-
-        if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate) ) {
+        if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
           Left(new RuntimeException("Invalid time range"))
         }
-        else{
+        else {
           val visit = visitationRequestEntity(
             id,
             Some(request.hostId),
