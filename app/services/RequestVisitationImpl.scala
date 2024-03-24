@@ -71,56 +71,50 @@ class RequestVisitationImpl @Inject()(
 
   def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
-    val xt = for{
-        resp <- extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
-      response <- resp match {
+   val ownerOption = extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
+
+    val responseData = for{
+        response <- ownerOption match {
         case  ownerID: Long  =>
+
+          val timeInDate = new DateTime(request.timeIn, DateTimeZone.UTC)
+          val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
+          val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
+
+          log.info(s" Current  time $currentDate ")
+          log.info(s" Starting time $timeInDate ")
+          log.info(s" ending  time $timeOutDate ")
+
+
+          if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
+            Left(new RuntimeException("Invalid time range"))
+          }
+          else {
+            val visit = visitationRequestEntity(
+              id,
+              Some(request.hostId),
+              Some(request.guestId),
+              request.officeId,
+              request.departmentId,
+              request.invitationType,
+              new Timestamp(System.currentTimeMillis()),
+              Some(authorizedUser.user.userId),
+              None,
+              Some(ownerID),
+              Some(getTimeStamp(timeInDate)),
+              Some(getTimeStamp(timeOutDate)),
+              Some(StatusEnum.PENDING.toString)
+            )
+            val updatedEntity = requestVisitationDao.update(id, visit)
+            val response = updatedEntity.map(populate)
+            Right(response)
+          }
+        case None => Left(new RuntimeException("User is not authorized "))
+
       }
-    }
 
-
-    val resp = extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
-
-    val response = resp match {
-      case ownerID: Long =>
-
-        val timeInDate = new DateTime(request.timeIn, DateTimeZone.UTC)
-        val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
-        val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
-
-        log.info(s" Current  time $currentDate ")
-        log.info(s" Starting time $timeInDate ")
-        log.info(s" ending  time $timeOutDate ")
-
-
-        if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
-          Left(new RuntimeException("Invalid time range"))
-        }
-        else {
-          val visit = visitationRequestEntity(
-            id,
-            Some(request.hostId),
-            Some(request.guestId),
-            request.officeId,
-            request.departmentId,
-            request.invitationType,
-            new Timestamp(System.currentTimeMillis()),
-            Some(authorizedUser.user.userId),
-            None,
-            Some(ownerID),
-            Some(getTimeStamp(timeInDate)),
-            Some(getTimeStamp(timeOutDate)),
-            Some(StatusEnum.PENDING.toString)
-          )
-          val updatedEntity = requestVisitationDao.update(id, visit)
-          val response = updatedEntity.map(populate)
-          Right(response)
-        }
-
-
-      case None => Left(new RuntimeException("User is not authorized "))
-    }
-    response
+    } yield response
+    responseData
 
   }
 
