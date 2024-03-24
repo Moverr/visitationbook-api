@@ -35,12 +35,11 @@ class RequestVisitationImpl @Inject()(
 
         val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
 
-        log.info(s" Current  time ${currentDate} ")
-        log.info(s" Starting time ${timeInDate} ")
-        log.info(s" ending  time ${timeOutDate} ")
-//(currentDate.isAfter(timeInDate)) ||
+        log.info(s" Current  time $currentDate ")
+        log.info(s" Starting time $timeInDate ")
+        log.info(s" ending  time $timeOutDate ")
 
-        if (timeInDate.isAfter(timeOutDate)) {
+        if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
           Left(new RuntimeException("Invalid time range"))
         }
         else {
@@ -72,63 +71,50 @@ class RequestVisitationImpl @Inject()(
 
   def update(authorizedUser: Auth, id: Long, request: VisitRequest): Either[Throwable, Future[RequestVisitResponse]] = {
 
+   val ownerOption = extractOwner(authorizedUser, RESOURCE).getOrElse(Future.failed(new RuntimeException("User is not authorized")))
 
-    val response = requestVisitationDao.getById(id)
-      .flatMap {
-        case Some(value) =>
-          ???
-        //Left(new RuntimeException("Time in Date is less than Time out Date"))
-        case None =>
-          ???
-        //Left(new RuntimeException("Time in Date is less than Time out Date"))
+    val responseData = for{
+        response <- ownerOption match {
+        case  ownerID: Long  =>
+
+          val timeInDate = new DateTime(request.timeIn, DateTimeZone.UTC)
+          val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
+          val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
+
+          log.info(s" Current  time $currentDate ")
+          log.info(s" Starting time $timeInDate ")
+          log.info(s" ending  time $timeOutDate ")
+
+
+          if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
+            Left(new RuntimeException("Invalid time range"))
+          }
+          else {
+            val visit = visitationRequestEntity(
+              id,
+              Some(request.hostId),
+              Some(request.guestId),
+              request.officeId,
+              request.departmentId,
+              request.invitationType,
+              new Timestamp(System.currentTimeMillis()),
+              Some(authorizedUser.user.userId),
+              None,
+              Some(ownerID),
+              Some(getTimeStamp(timeInDate)),
+              Some(getTimeStamp(timeOutDate)),
+              Some(StatusEnum.PENDING.toString)
+            )
+            val updatedEntity = requestVisitationDao.update(id, visit)
+            val response = updatedEntity.map(populate)
+            Right(response)
+          }
+        case None => Left(new RuntimeException("User is not authorized "))
+
       }
 
-    Right(response.recover {
-      case e: Throwable => throw new RuntimeException("Error occurred during visit update", e)
-    })
-
-    /*
-
-  visitationRequest.map {
-      case Some(existingRequest) =>
-        val timeInDate: Option[DateTime] = request.timeIn.map(DateTime.parse)
-        val timeOutDate: Option[DateTime] = request.timeOut.map(DateTime.parse)
-
-        if ((timeInDate.isDefined && timeOutDate.isDefined) && (timeInDate.get.toDateTime().toDateTime() > timeOutDate.get.toDateTime())) {
-          Left(new RuntimeException("Time in Date is less than Time out Date"))
-        }
-        else {
-
-          val visit: visitationRequestEntity = visitationRequestEntity(
-            0L
-            , Some(request.hostId)
-            , Some(request.guestId)
-            , request.officeId
-            , request.departmentId
-            , request.invitationType
-            , new Timestamp(System.currentTimeMillis())
-            , Some(authorizedUser.user.userId)
-            , None
-            , None
-            , timeInDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , timeOutDate.map((x: DateTime) => new Timestamp(x.getMillis))
-            , Some(StatusEnum.PENDING.toString)
-          )
-
-          val responseData = for {
-            response <- requestVisitationDao.update(id, visit)
-          } yield populate(response)
-
-          Right(responseData)
-        }
-
-
-
-      case None => Left(new RuntimeException("Time in Date is less than Time out Date"))
-    }
-
-    */
-
+    } yield response
+    responseData
 
   }
 
@@ -174,7 +160,7 @@ class RequestVisitationImpl @Inject()(
       , entity._1.invType.getOrElse("NONE")
       , None
       , Some(entity._1.createdAt.toLocalDateTime.toString)
-      , entity._1.updatedAt.map(x=>x.toLocalDateTime.toString)
+      , entity._1.updatedAt.map(x => x.toLocalDateTime.toString)
     )
 
   }
@@ -191,7 +177,7 @@ class RequestVisitationImpl @Inject()(
       , entity.invType.getOrElse("NONE")
       , None
       , Some(entity.createdAt.toLocalDateTime.toString)
-      , entity.updatedAt.map(x=>x.toLocalDateTime.toString)
+      , entity.updatedAt.map(x => x.toLocalDateTime.toString)
     )
 
   }
