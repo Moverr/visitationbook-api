@@ -171,5 +171,8 @@ class AuthenticationFilter @Inject()
 
   private lazy val log = Logger(getClass).logger
 
-  private def shouldExclude(path: String): Boolean = exactPaths.exists(item => item.equalsIgnoreCase(path)) || relativePaths.exists(item => item.startsWith(path))
+  private def shouldExclude(path: String): Boolean = {
+    //exactPaths.exists(item => item.equalsIgnoreCase(path)) ||
+      relativePaths.exists(item => item.startsWith(path))
+  }
 }
