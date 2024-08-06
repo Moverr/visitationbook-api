@@ -60,14 +60,21 @@ class VisitRequestController @Inject()(
 
   def list(limit: Long, offset: Long): Action[AnyContent] = Action.async { implicit request =>
 
-    val auths: Option[Auth] = cache.get("auth")
+   val auths: Option[Auth] = cache.get("auth")
+    println("Testing out Auth implementation ")
+
+    println(auths.toString)
+
+
     auths match {
       case Some(auth) => service.list(auth, offset, limit) match {
         case Left(e: Exception) => Future.successful(BadRequest(e.getLocalizedMessage))
-        case Right(response: Future[Seq[RequestVisitResponse]]) => response.flatMap(value => Future.successful(Ok(Json.toJson(value))))
+        case Right(_) => Future.successful(Ok("Jangu ewange"))
       }
-      case None => Future.successful(Unauthorized(" User is not authorized to access this endpoint "))
+      case None => Future.successful(NotFound(" Authentication is EMpty "))
     }
+
+
   }
 
 

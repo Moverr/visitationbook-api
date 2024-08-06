@@ -47,11 +47,11 @@ class AuthenticationFilter @Inject()
 
         val token = bearerInfo.flatMap(_.headOption.filter(_.nonEmpty)).getOrElse("NONE")
 
-        log.info(s"Token done ''''''''  "+token)
+        println(s"Token done ''''''''  "+token)
 
         token match {
           case "NONE" =>
-            log.info(s" No token provided  ")
+            println(s" No token provided  ")
 
             val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
             val unauthorizedJson = ExceptionHandler.errorExceptionWrites.writes(exception)
@@ -60,7 +60,7 @@ class AuthenticationFilter @Inject()
             Future.successful(Unauthorized(unAuthorizedAccess))
 
           case _ =>
-            log.info(s"  token  provided :    ${token} ")
+            println(s"  token  provided :    ${token} ")
             userManager.isAuthenticated(token)
               .flatMap {
                 case Left(exc: Throwable) =>
@@ -76,6 +76,7 @@ class AuthenticationFilter @Inject()
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
                       Unauthorized(unAuthorizedAccess)
 
+                      /*
                     case e: BadRequestException =>
                       println("Test the links")
                       log.info(e.getMessage)
@@ -85,6 +86,7 @@ class AuthenticationFilter @Inject()
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
                       log.debug(e.getMessage)
                       BadRequest(unAuthorizedAccess)
+                      */
 
                     case _: InternalException =>
                       val exception = ErrorException(exc.getLocalizedMessage, exc.getMessage, INTERNAL_SERVER_ERROR)
@@ -110,13 +112,24 @@ class AuthenticationFilter @Inject()
                   log.info(s" Header method :: ---  ${method}  :: url ${url}")
                   val urlMap = extractBaseURL(url);
                   log.info(s" Digging deep : ${urlMap}")
+                  println("Authentication  :: ");
+                  println(auth);
+                  cache.set("auth", auth)
 
-                  auth.user.roles.flatMap(_.permissions.find(permission =>
+
+/*
+
+                  auth.user.roles.flatMap(
+
+                      _.permissions.find(permission =>
                       permission.resource.equalsIgnoreCase(urlMap) && validateCrudpermission(method, permission)
-                    ))
+                    )
+
+
+                    )
                     .headOption
                     .map {
-                      permission =>
+                      _ =>
                         cache.set("auth", auth)
                         log.info("Caching set succesfuly")
                         nextFilter(requestHeader)
@@ -128,7 +141,10 @@ class AuthenticationFilter @Inject()
                       val unAuthorizedAccess = Json.toJson(unauthorizedJson)
                       Future.successful(Unauthorized(unAuthorizedAccess))
                     }
-
+                  */
+                  cache.set("auth", auth)
+                  log.info("Caching set succesfuly")
+                  nextFilter(requestHeader)
 
                 case _ =>
                   val exception = ErrorException("un authorized access", "Unauthorized", UNAUTHORIZED)
@@ -145,7 +161,8 @@ class AuthenticationFilter @Inject()
   }
 
   private val urlMapper = mutable.HashMap[String, String](
-    "/v1/request/visit" -> "VISITATIONREQUESTS"
+    "/v1/request/visit" -> "VISITATIONREQUESTS",
+  "/v1/request/visit/list" -> "VISITATIONREQUESTS"
   )
 
   def extractBaseURL(url: String): String = {
@@ -172,7 +189,9 @@ class AuthenticationFilter @Inject()
   private lazy val log = Logger(getClass).logger
 
   private def shouldExclude(path: String): Boolean = {
-    //exactPaths.exists(item => item.equalsIgnoreCase(path)) ||
-      relativePaths.exists(item => item.startsWith(path))
+  //  exactPaths.exists(item => item.equalsIgnoreCase(path)) ||
+ //     relativePaths.exists(item => item.startsWith(path))
+
+    true
   }
 }
