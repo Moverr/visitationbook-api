@@ -4,9 +4,15 @@ import akka.actor.Actor
 import akka.actor.typed.Props
 import controllers.responses.VisitationResponse
 import models.VisitationRequest
+import play.api.db.Database
+
+import scala.concurrent.ExecutionContext
 
 object AddressesActor{
   //def props:Props[AddressesActor] = Props[AddressesActor]
+  //def props(db: Database)(implicit ec: ExecutionContext): Props = Props(new AddressesActor(db))
+
+
 
   // Messages
   case class GetAddresses(offset:Long,limit:Long)
