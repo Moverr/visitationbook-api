@@ -9,7 +9,6 @@ case class Address(
                     state: String,
                     postalCode: String,
                     country: String,
-                    lat: Long,
                     latitude: Option[Double], // Latitude as a Double
                     longitude: Option[Double] // Longitude as a Double
 
