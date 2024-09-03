@@ -64,6 +64,7 @@ class AddressesActor @Inject()(addressDAO: AddressDAO)(implicit val executionCon
     case CreateAddress(request: AddressRequest) =>
       addressDAO.create(populate(request))
         .map( response)
+        .map(AddressCreated)
         .pipeTo(sender())
 
 
