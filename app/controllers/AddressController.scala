@@ -62,6 +62,13 @@ class AddressController @Inject()
 
 
   def get(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    addressesActor ! get(id)
+      .map{
+        result =>
+          result match {
+            case
+          }
+      }
     ???
   }
 

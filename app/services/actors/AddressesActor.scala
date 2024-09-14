@@ -27,7 +27,7 @@ object AddressesActor  {
 
   case class GetAddress(id: Long)
 
-  case class CreateAddress(request: AddressRequest)
+  case class   CreateAddress(request: AddressRequest)
 
   case class DeleteAddress(id: Long)
 
