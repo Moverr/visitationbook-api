@@ -81,9 +81,9 @@ class RequestVisitationImpl @Inject()(
           val timeOutDate = new DateTime(request.timeOut, DateTimeZone.UTC)
           val currentDate: DateTime = new DateTime(DateTimeZone.UTC)
 
-          log.info(s" Current  time $currentDate ")
-          log.info(s" Starting time $timeInDate ")
-          log.info(s" ending  time $timeOutDate ")
+          log.debug(s" Current  time $currentDate ")
+          log.debug(s" Starting time $timeInDate ")
+          log.debug(s" ending  time $timeOutDate ")
 
 
           if (timeInDate.isAfter(timeOutDate) || timeInDate.isAfter(currentDate)) {
@@ -119,17 +119,19 @@ class RequestVisitationImpl @Inject()(
   }
 
 
-  def list(authorizedUser: Auth, offset: Long, limit: Long): Either[Throwable, Future[Seq[RequestVisitResponse]]] = {
 
-    log.info("List Information ")
+  def list(authorizedUser: Auth, offset: Long, limit: Long): Either[Throwable, Future[String]] = {
 
-    val ownerId: Option[Long] = extractOwner(authorizedUser, RESOURCE)
+//    println("List Information "+authorizedUser.user.userId)
 
+  ///  val ownerId: Option[Long] = extractOwner(authorizedUser, RESOURCE)
+/*
     val response: Future[Seq[(visitationRequestEntity, Option[ProfileEntity], Option[ProfileEntity])]] =
       requestVisitationDao.list(ownerId, offset, limit)
 
     val records: Future[Seq[RequestVisitResponse]] = response.map(_.map(populate))
-    Right(records)
+    */
+    Right(Future.successful(   "MOvers"))
   }
 
   def getById(id: Long): Future[Option[RequestVisitResponse]] = {

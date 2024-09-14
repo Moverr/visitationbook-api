@@ -73,5 +73,14 @@ libraryDependencies ++= Seq(
 ).map(_ % circeVersion)
 
 
+
+libraryDependencies ++= Seq(
+  "com.google.guava" % "guava" % "31.1-jre",
+  "com.google.inject" % "guice" % "5.1.0",
+  "com.typesafe.play" %% "play-guice" % play.core.PlayVersion.current
+)
+
+
+
 dockerExposedPorts ++= Seq(9000, 9001)
 dockerExposedUdpPorts += 4444
