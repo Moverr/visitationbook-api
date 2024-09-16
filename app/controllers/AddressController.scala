@@ -6,11 +6,12 @@ import controllers.requests.AddressRequest
 import controllers.responses.{AddressResponse, ErrorResponse}
 import play.api.libs.json.{JsError, JsSuccess, Json}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
-import services.actors.AddressesActor.{AddressCreated, AddressList, CreateAddress, GetAddresses}
+import services.actors.AddressesActor.{AddressCreated, AddressDeleted, AddressList, CreateAddress, DeleteAddress, GetAddress, GetAddresses}
 import shapeless.Lazy.apply
+import shapeless.ops.zipper.Delete
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future.never.recover
+import scala.concurrent.Future.never.{recover, result}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -61,20 +62,29 @@ class AddressController @Inject()
   }
 
 
-  def get(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    addressesActor ! get(id)
+  def getById(id: Long): Action[AnyContent] = Action.async { implicit request =>
+    addressesActor ! GetAddress(id)
       .map{
         result =>
           result match {
-            case
+            case AddressCreated(addressResponse:AddressResponse) => Ok(Json.toJson(addressResponse))
+            case _=> BadRequest(Json.toJson(ErrorResponse(400,"Record was not set up properly")))
           }
       }
-    ???
+
   }
 
 
-  def delete(id: Long): Action[AnyContent] = Action.async { implicit request =>
-    ???
-  }
+    def delete(id: Long): Action[AnyContent] = Action.async { implicit request =>
+      addressesActor ! DeleteAddress(id)
+        .map{
+          result =>
+            result match {
+              case AddressDeleted(x:true) =>> Ok(Json.toJson("Record Deleted"))
+              case _ => BadRequest(Json.toJson(ErrorResponse(400,"Record was not set up properly")))
+            }
+
+        }
+    }
 
 }

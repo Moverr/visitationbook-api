@@ -20,3 +20,10 @@ def ee(x:Int): Int  = {
   x => x + 2
 }
 val bthrows = addNM( ee(2) ,2)
+
+
+val numbers = Array(1,2,3,4,5)
+val filteredNumbers = numbers.filterNot(b => b % 2 == 0)
+
+
+val bn = numbers.map(_=> _ * 2)
